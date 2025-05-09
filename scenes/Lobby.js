@@ -6,7 +6,7 @@ export default class Lobby extends Phaser.Scene {
     create() {
         const { width, height } = this.sys.game.canvas;
 
-        // 배경 이미지 생성 및 비율 유지 확대
+        // 배경 이미지 설정
         const bg = this.add.image(width / 2, height / 2, 'main').setAlpha(0);
         const iw = this.textures.get('main').getSourceImage().width;
         const ih = this.textures.get('main').getSourceImage().height;
@@ -20,29 +20,24 @@ export default class Lobby extends Phaser.Scene {
             ease: 'Linear',
         });
 
-        // 실제 표시된 배경의 크기 계산
         const displayWidth = iw * scale;
         const displayHeight = ih * scale;
 
-        // 배경 안쪽 기준으로 버튼 위치 계산
-        const rightX = width / 2 + displayWidth / 2 - 700;
-        const bottomY = height / 2 + displayHeight / 2 - 100;
-        const spacing = 100;
-        const buttonScale = 0.5;
+        // 기준 위치 (배경 기준 우측 하단)
+        const baseX = width / 2 + displayWidth / 2;
+        const baseY = height / 2 + displayHeight / 2;
 
-        const buttons = [
-            { key: 'button_start', scene: 'Class' },
-            { key: 'button_research', scene: 'Research' },
-            { key: 'button_record', scene: 'Record' }
-        ];
+        // 버튼 위치 조정
+        const button_start = this.add.image(baseX - 180, baseY - 70, 'button_start').setInteractive();
+        button_start.setScale(0.7);
+        button_start.on('pointerdown', () => this.scene.start('Class'));
 
-        buttons.forEach((btn, index) => {
-            const button = this.add.image(rightX, bottomY - spacing * index, btn.key).setInteractive();
-            button.setScale(buttonScale);
+        const button_research = this.add.image(baseX - 280, baseY - 170, 'button_research').setInteractive();
+        button_research.setScale(0.5);
+        button_research.on('pointerdown', () => this.scene.start('Research'));
 
-            button.on('pointerdown', () => {
-                this.scene.start(btn.scene);
-            });
-        });
+        const button_record = this.add.image(baseX - 200, baseY - 170, 'button_record').setInteractive();
+        button_record.setScale(0.5);
+        button_record.on('pointerdown', () => this.scene.start('Record'));
     }
 }
