@@ -23,7 +23,7 @@ export default class Lobby extends Phaser.Scene {
         const baseX = width / 2 + displayWidth / 2;
         const baseY = height / 2 + displayHeight / 2;
 
-        const button_start = this.add.image(baseX - 0.26 * width, baseY - 0.26 * width, 'button_start').setScale(7 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_start = this.add.image(baseX - 0.26 * width, baseY - 0.26 * width, 'button_start').setScale(2.1 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         button_start.on('pointerdown', () => button_start.setTint(0xaaaaaa));
         button_start.on('pointerup', () => {
             button_start.clearTint();
@@ -31,7 +31,7 @@ export default class Lobby extends Phaser.Scene {
         });
         button_start.on('pointerout', () => button_start.clearTint());
 
-        const button_research = this.add.image(baseX - 0.16 * width, baseY - 0.13 * width, 'button_research').setScale(5 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_research = this.add.image(baseX - 0.16 * width, baseY - 0.13 * width, 'button_research').setScale(1.5 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         button_research.on('pointerdown', () => button_research.setTint(0xaaaaaa));
         button_research.on('pointerup', () => {
             button_research.clearTint();
@@ -39,7 +39,7 @@ export default class Lobby extends Phaser.Scene {
         });
         button_research.on('pointerout', () => button_research.clearTint());
 
-        const button_record = this.add.image(baseX - 0.06 * width, baseY - 0.13 * width, 'button_record').setScale(5 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_record = this.add.image(baseX - 0.06 * width, baseY - 0.13 * width, 'button_record').setScale(1.5 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         button_record.on('pointerdown', () => button_record.setTint(0xaaaaaa));
         button_record.on('pointerup', () => {
             button_record.clearTint();
