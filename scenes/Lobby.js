@@ -28,15 +28,15 @@ export default class Lobby extends Phaser.Scene {
         const baseY = height / 2 + displayHeight / 2;
 
         // 버튼 위치 조정
-        const button_start = this.add.image(baseX - 180, baseY - 70, 'button_start').setInteractive();
+        const button_start = this.add.image(baseX - 180, baseY - 230, 'button_start').setInteractive();
         button_start.setScale(0.7);
         button_start.on('pointerdown', () => this.scene.start('Class'));
 
-        const button_research = this.add.image(baseX - 280, baseY - 170, 'button_research').setInteractive();
+        const button_research = this.add.image(baseX - 300, baseY - 120, 'button_research').setInteractive();
         button_research.setScale(0.5);
         button_research.on('pointerdown', () => this.scene.start('Research'));
 
-        const button_record = this.add.image(baseX - 200, baseY - 170, 'button_record').setInteractive();
+        const button_record = this.add.image(baseX - 140, baseY - 120, 'button_record').setInteractive();
         button_record.setScale(0.5);
         button_record.on('pointerdown', () => this.scene.start('Record'));
     }
