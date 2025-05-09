@@ -17,7 +17,7 @@ export default class License extends Phaser.Scene {
         this.tweens.add({
             targets: image,
             alpha: 1,
-            duration: 1000,
+            duration: 2000,
             ease: 'Linear',
             yoyo: true,
             hold: 2000,

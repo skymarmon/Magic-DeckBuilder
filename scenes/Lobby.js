@@ -20,7 +20,7 @@ export default class Lobby extends Phaser.Scene {
         this.tweens.add({
             targets: image,
             alpha: 1,
-            duration: 1000,
+            duration: 2000,
             ease: 'Linear',
         });
     }
