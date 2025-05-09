@@ -21,9 +21,7 @@ export default class License extends Phaser.Scene {
             ease: 'Linear',
             yoyo: true,
             hold: 2000,
-            onComplete: () => this.scene.start('Lobby')
+            onComplete: () => this.scene.start('Lobby', { fromLicense: true })
         });
-
-        this.scene.start('Lobby', { fromLicense: true });
     }
 }
