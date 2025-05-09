@@ -56,7 +56,7 @@ export default class Lobby extends Phaser.Scene {
             this.tweens.add({
                 targets: [bg, button_start, button_research, button_record],
                 alpha: 1,
-                duration: 1000,
+                duration: 2000,
                 ease: 'Linear'
             });
         }
