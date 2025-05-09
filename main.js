@@ -13,12 +13,12 @@ import WinLose from './scenes/WinLose.js';
 
 const config = {
     type: Phaser.AUTO,
-    width: 1280,
-    height: 720,
+    width: window.innerWidth,
+    height: window.innerHeight,
     backgroundColor: '#000000',
     scene: [
-        Images,  // 이미지를 로드하는 씬
-        License, // License 씬
+        Images,
+        License,
         Lobby,
         Research,
         Record,
