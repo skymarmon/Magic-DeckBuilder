@@ -1,4 +1,3 @@
-
 export default class Images extends Phaser.Scene {
     constructor() {
         super('Images');
@@ -9,6 +8,6 @@ export default class Images extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(400, 300, 'Image Preload Scene', { fontSize: '32px', color: '#fff' }).setOrigin(0.5);
+        this.scene.start('License');
     }
 }

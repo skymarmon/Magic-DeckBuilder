@@ -1,3 +1,4 @@
+import Images from './scenes/Images.js';
 import License from './scenes/License.js';
 import Lobby from './scenes/Lobby.js';
 import Research from './scenes/Research.js';
@@ -9,7 +10,6 @@ import Combat from './scenes/Combat.js';
 import FieldPause from './scenes/FieldPause.js';
 import CombatPause from './scenes/CombatPause.js';
 import WinLose from './scenes/WinLose.js';
-import Images from './scenes/Images.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -17,7 +17,8 @@ const config = {
     height: 720,
     backgroundColor: '#000000',
     scene: [
-        License,
+        Images,  // 이미지를 로드하는 씬
+        License, // License 씬
         Lobby,
         Research,
         Record,
@@ -27,8 +28,7 @@ const config = {
         Combat,
         FieldPause,
         CombatPause,
-        WinLose,
-        Images
+        WinLose
     ],
     physics: {
         default: 'arcade',
