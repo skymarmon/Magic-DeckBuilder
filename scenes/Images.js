@@ -5,6 +5,7 @@ export default class Images extends Phaser.Scene {
 
     preload() {
         this.load.image('credit', 'assets/images/credit.png');
+        this.load.image('main', 'assets/images/main.png');
     }
 
     create() {
