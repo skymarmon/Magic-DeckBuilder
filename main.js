@@ -9,6 +9,7 @@ import Combat from './scenes/Combat.js';
 import FieldPause from './scenes/FieldPause.js';
 import CombatPause from './scenes/CombatPause.js';
 import WinLose from './scenes/WinLose.js';
+import Images from './scenes/Images.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -26,7 +27,8 @@ const config = {
         Combat,
         FieldPause,
         CombatPause,
-        WinLose
+        WinLose,
+        Images
     ],
     physics: {
         default: 'arcade',
