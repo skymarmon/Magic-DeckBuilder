@@ -23,5 +23,7 @@ export default class License extends Phaser.Scene {
             hold: 2000,
             onComplete: () => this.scene.start('Lobby')
         });
+
+        this.scene.start('Lobby', { fromLicense: true });
     }
 }
