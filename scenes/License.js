@@ -5,7 +5,7 @@ export default class License extends Phaser.Scene {
 
     create() {
         this.cameras.main.setBackgroundColor('#ffffff');
-        const image = this.add.image(window.innerWidth / 2, window.innerHeight / 2 + 200, 'credit').setAlpha(0);
+        const image = this.add.image(window.innerWidth / 2, window.innerHeight / 2 + 100, 'credit').setAlpha(0);
         image.setScale(0.3);
 
         this.tweens.add({
