@@ -48,6 +48,9 @@ export default class Lobby extends Phaser.Scene {
 
         if (this.fromLicense) {
             bg.setAlpha(0);
+            button_start.setAlpha(0);
+            button_research.setAlpha(0);
+            button_record.setAlpha(0);
 
             this.tweens.add({
                 targets: [bg, button_start, button_research, button_record],
