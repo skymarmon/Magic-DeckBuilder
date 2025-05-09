@@ -25,7 +25,7 @@ export default class Lobby extends Phaser.Scene {
         const displayHeight = ih * scale;
 
         // 배경 안쪽 기준으로 버튼 위치 계산
-        const rightX = width / 2 + displayWidth / 2 - 100;
+        const rightX = width / 2 + displayWidth / 2 - 700;
         const bottomY = height / 2 + displayHeight / 2 - 100;
         const spacing = 100;
         const buttonScale = 0.5;
