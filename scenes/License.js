@@ -4,8 +4,8 @@ export default class License extends Phaser.Scene {
     }
 
     create() {
-        const image = this.add.image(640, 360, 'credit').setAlpha(0);
-        image.setScale(0.3);
+        const image = this.add.image(window.innerWidth / 2, window.innerHeight - 50, 'credit').setAlpha(0);
+        image.setScale(0.2);
 
         this.tweens.add({
             targets: image,
