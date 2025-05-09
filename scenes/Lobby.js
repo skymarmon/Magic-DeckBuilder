@@ -23,13 +23,13 @@ export default class Lobby extends Phaser.Scene {
         const baseY = height / 2 + displayHeight / 2;
 
         // 버튼 미리 생성
-        const button_start = this.add.image(baseX - 600, baseY - 230, 'button_start').setScale(0.7).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_start = this.add.image(baseX - 400, baseY - 230, 'button_start').setScale(0.7).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         button_start.on('pointerdown', () => this.scene.start('Class'));
 
-        const button_research = this.add.image(baseX - 300, baseY - 120, 'button_research').setScale(0.5).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_research = this.add.image(baseX - 270, baseY - 120, 'button_research').setScale(0.5).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         button_research.on('pointerdown', () => this.scene.start('Research'));
 
-        const button_record = this.add.image(baseX - 140, baseY - 120, 'button_record').setScale(0.5).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_record = this.add.image(baseX - 110, baseY - 120, 'button_record').setScale(0.5).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         button_record.on('pointerdown', () => this.scene.start('Record'));
 
         // 배경 투명도
