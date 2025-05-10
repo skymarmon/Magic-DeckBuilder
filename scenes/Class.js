@@ -51,7 +51,7 @@ export default class Class extends Phaser.Scene {
             .setInteractive();
 
         const liw = this.textures.get('button_location').getSourceImage().width;
-        const locationScale = Math.min((width * 0.08) / liw, 1);
+        const locationScale = Math.min((width * 0.2) / liw, 1);
         locationButton.setScale(locationScale);
 
         let locationPressed = false;
