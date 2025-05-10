@@ -13,6 +13,7 @@ export default class Images extends Phaser.Scene {
         this.load.image('class_backspace', 'assets/images/class_backspace.png');
         this.load.image('button_location', 'assets/images/button_location.png');
         this.load.image('class_wizard', 'assets/images/class_wizard.png');
+        this.load.image('class_astronomer', 'assets/images/class_astronomer.png');
     }
 
     create() {
