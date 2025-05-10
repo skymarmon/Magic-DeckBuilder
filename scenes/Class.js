@@ -1,4 +1,4 @@
-import { updateClassTint, class_, class_level, now_class as global_now_class } from '../main.js';
+import { updateClassTint, class_, class_level, getNowClass, setNowClass } from '../main.js';
 
 export default class Class extends Phaser.Scene {
     constructor() {
@@ -12,8 +12,8 @@ export default class Class extends Phaser.Scene {
         this.add.rectangle(0, 0, width, height, 0x222222).setOrigin(0);
 
         // 기본 클래스 설정
-        if (global_now_class === '') {
-            global_now_class = 'wizard';
+        if (getNowClass() === '') {
+            setNowClass('wizard');
         }
 
         // 중앙 상단 텍스트
@@ -88,8 +88,7 @@ export default class Class extends Phaser.Scene {
         });
         wizardButton.on('pointerup', (pointer) => {
             if (wizardPressed && wizardButton.getBounds().contains(pointer.x, pointer.y)) {
-                global_now_class = 'wizard';
-                // 모든 클래스 버튼 tint 업데이트
+                setNowClass('wizard');
                 for (const key in class_) {
                     updateClassTint(key, false);
                 }
@@ -102,7 +101,6 @@ export default class Class extends Phaser.Scene {
             updateClassTint('wizard', false);
         });
 
-        // 초기 tint 설정
         updateClassTint('wizard', false);
     }
 }

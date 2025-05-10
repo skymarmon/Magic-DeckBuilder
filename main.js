@@ -1,3 +1,5 @@
+// main.js
+
 import Images from './scenes/Images.js';
 import License from './scenes/License.js';
 import Lobby from './scenes/Lobby.js';
@@ -40,17 +42,23 @@ let class_level = {
 
 let now_class = '';
 
-let class_ = {}; // 각 클래스 버튼 참조
+export function getNowClass() {
+    return now_class;
+}
+
+export function setNowClass(value) {
+    now_class = value;
+}
+
+export let class_ = {};
 
 export function updateClassTint(classname, ifPressed) {
     const button = class_[classname];
-    if (!button) return;
-
     const level = class_level[classname] || 0;
 
     let baseColor;
 
-    if (now_class === classname) {
+    if (getNowClass() === classname) {
         baseColor = 0xffffcc; // 연노랑
     } else {
         switch (level) {
@@ -68,7 +76,9 @@ export function updateClassTint(classname, ifPressed) {
         baseColor = Phaser.Display.Color.IntegerToColor(baseColor).darken(20).color;
     }
 
-    button.setTint(baseColor);
+    if (button) {
+        button.setTint(baseColor);
+    }
 }
 
 const config = {
@@ -103,5 +113,3 @@ const config = {
 };
 
 new Phaser.Game(config);
-
-export { class_level, now_class, class_ };
