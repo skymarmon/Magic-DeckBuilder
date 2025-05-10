@@ -44,6 +44,13 @@ if (!window.now_class) {
     window.now_class = '';
 }
 
+export const class_name = {
+    wizard: "마법사",
+    astronomer: "천문학자",
+    cryomancer: "빙결사",
+    shaman: "주술사",
+};
+
 export function getNowClass() {
     return now_class;
 }

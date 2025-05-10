@@ -1,6 +1,6 @@
 // Class.js
 
-import { updateClassTint, class_, class_level, getNowClass, setNowClass } from '../main.js';
+import { updateClassTint, class_, class_level, class_name, getNowClass, setNowClass } from '../main.js';
 
 export default class Class extends Phaser.Scene {
     constructor() {
@@ -18,8 +18,8 @@ export default class Class extends Phaser.Scene {
             setNowClass('wizard');
         }
 
-        // 중앙 상단 텍스트
-        this.add.text(width * 0.75, height * 0.1, '학파 선택', {
+        const classText = class_name[getNowClass()] || "Class Selection";
+        this.add.text(width / 2, height * 0.1, classText, {
             fontFamily: 'JejuHallasan',
             fontSize: `${Math.floor(width * 0.04)}px`,
             color: '#ffffff'
