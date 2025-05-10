@@ -40,8 +40,12 @@ let class_level = {
 
 let now_class = '';
 
+let class_ = {}; // 각 클래스 버튼 참조
+
 export function updateClassTint(classname, ifPressed) {
     const button = class_[classname];
+    if (!button) return;
+
     const level = class_level[classname] || 0;
 
     let baseColor;
@@ -60,7 +64,6 @@ export function updateClassTint(classname, ifPressed) {
         }
     }
 
-    // 눌렸다면 살짝 어둡게
     if (ifPressed) {
         baseColor = Phaser.Display.Color.IntegerToColor(baseColor).darken(20).color;
     }
@@ -100,3 +103,5 @@ const config = {
 };
 
 new Phaser.Game(config);
+
+export { class_level, now_class, class_ };
