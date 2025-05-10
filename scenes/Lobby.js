@@ -22,13 +22,13 @@ export default class Lobby extends Phaser.Scene {
         const baseX = width / 2 + displayWidth / 2;
         const baseY = height / 2 + displayHeight / 2;
 
-        const button_start = this.add.image(baseX - 440, baseY - 230, 'button_start').setScale(0.7).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_start = this.add.image(baseX - 0.26 * iw * scale, baseY - 0.26 * ih * scale, 'button_start').setScale(2.1 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         let startPressed = false;
         button_start.on('pointerdown', () => {
             startPressed = true;
             button_start.setTint(0xaaaaaa);
         });
-        button_start.on('pointerup', (pointer) => {
+        button_start.on('pointerup', (pointer, localX, localY, event) => {
             if (startPressed && button_start.getBounds().contains(pointer.x, pointer.y)) {
                 this.scene.start('Class');
             }
@@ -40,25 +40,7 @@ export default class Lobby extends Phaser.Scene {
             button_start.clearTint();
         });
 
-        const button_research = this.add.image(baseX - 270, baseY - 120, 'button_research').setScale(0.5).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
-        let researchPressed = false;
-        button_research.on('pointerdown', () => {
-            researchPressed = true;
-            button_research.setTint(0xaaaaaa);
-        });
-        button_research.on('pointerup', (pointer) => {
-            if (researchPressed && button_research.getBounds().contains(pointer.x, pointer.y)) {
-                this.scene.start('Research');
-            }
-            researchPressed = false;
-            button_research.clearTint();
-        });
-        button_research.on('pointerout', () => {
-            researchPressed = false;
-            button_research.clearTint();
-        });
-
-        const button_record = this.add.image(baseX - 110, baseY - 120, 'button_record').setScale(0.5).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_research = this.add.image(baseX - 0.16 * iw * scale, baseY - 0.13 * ih * scale, 'button_research').setScale(1.5 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         let recordPressed = false;
         button_record.on('pointerdown', () => {
             recordPressed = true;
@@ -76,13 +58,24 @@ export default class Lobby extends Phaser.Scene {
             button_record.clearTint();
         });
 
+        const button_record = this.add.image(baseX - 0.06 * iw * scale, baseY - 0.13 * ih * scale, 'button_record').setScale(1.5 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        button_record.on('pointerdown', () => button_record.setTint(0xaaaaaa));
+        button_record.on('pointerup', () => {
+            button_record.clearTint();
+            this.scene.start('Record');
+        });
+        button_record.on('pointerout', () => button_record.clearTint());
+
         if (this.fromLicense) {
             bg.setAlpha(0);
+            button_start.setAlpha(0);
+            button_research.setAlpha(0);
+            button_record.setAlpha(0);
 
             this.tweens.add({
                 targets: [bg, button_start, button_research, button_record],
                 alpha: 1,
-                duration: 1000,
+                duration: 2000,
                 ease: 'Linear'
             });
         }
