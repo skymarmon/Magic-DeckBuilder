@@ -40,7 +40,7 @@ let class_level = {
 
 let now_class = '';
 
-function updateClassTint(classname, ifPressed) {
+export function updateClassTint(classname, ifPressed) {
     const button = class_[classname];
     const level = class_level[classname] || 0;
 
