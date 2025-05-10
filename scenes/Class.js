@@ -1,3 +1,4 @@
+// Class.js
 import { updateClassTint, class_, class_level, getNowClass, setNowClass } from '../main.js';
 
 export default class Class extends Phaser.Scene {
@@ -89,6 +90,7 @@ export default class Class extends Phaser.Scene {
         wizardButton.on('pointerup', (pointer) => {
             if (wizardPressed && wizardButton.getBounds().contains(pointer.x, pointer.y)) {
                 setNowClass('wizard');
+                // 모든 클래스 버튼 tint 업데이트
                 for (const key in class_) {
                     updateClassTint(key, false);
                 }

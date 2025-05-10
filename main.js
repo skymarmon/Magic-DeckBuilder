@@ -13,7 +13,7 @@ import FieldPause from './scenes/FieldPause.js';
 import CombatPause from './scenes/CombatPause.js';
 import WinLose from './scenes/WinLose.js';
 
-let class_level = {
+export let class_level = {
     wizard: 1,
     astronomer: 0,
     cryomancer: 0,
