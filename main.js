@@ -40,7 +40,9 @@ export let class_level = {
     blackmage: 0
 };
 
-let now_class = '';
+if (!window.now_class) {
+    window.now_class = '';
+}
 
 export function getNowClass() {
     return now_class;

@@ -10,7 +10,7 @@ export default class Class extends Phaser.Scene {
     create() {
         const { width, height } = this.sys.game.canvas;
 
-        // 배경을 검은색으로 설정
+        // 배경
         this.add.rectangle(0, 0, width, height, 0x000000).setOrigin(0);
 
         // 기본 클래스 설정
@@ -19,13 +19,13 @@ export default class Class extends Phaser.Scene {
         }
 
         // 중앙 상단 텍스트
-        const titleText = this.add.text(width / 2, height * 0.1, '학파 선택', {
+        this.add.text(width / 2, height * 0.1, '학파 선택', {
             fontFamily: 'JejuHallasan',
             fontSize: `${Math.floor(width * 0.04)}px`,
             color: '#ffffff'
         }).setOrigin(0.5);
 
-        // 우측 상단 뒤로가기 버튼
+        // 뒤로가기 버튼
         const backButton = this.add.image(width * 0.95, height * 0.1, 'class_backspace')
             .setOrigin(1, 0.5)
             .setInteractive();
@@ -39,7 +39,7 @@ export default class Class extends Phaser.Scene {
         });
         backButton.on('pointerup', (pointer) => {
             if (backPressed && backButton.getBounds().contains(pointer.x, pointer.y)) {
-                this.scene.start('Lobby');
+                this.scene.start('Lobby', fromLicense = false);
             }
             backPressed = false;
             backButton.clearTint();
@@ -49,7 +49,7 @@ export default class Class extends Phaser.Scene {
             backButton.clearTint();
         });
 
-        // 우측 하단 Location 버튼
+        // Location 버튼
         const locationButton = this.add.image(width * 0.95, height * 0.95, 'button_location')
             .setOrigin(1, 1)
             .setInteractive();
@@ -73,66 +73,59 @@ export default class Class extends Phaser.Scene {
             locationButton.clearTint();
         });
 
-        // 좌측 상단 wizard 클래스 버튼
-        const wizardButton = this.add.image(width * 0.05, height * 0.1, 'class_wizard')
-            .setOrigin(0, 0.5)
-            .setInteractive();
+        // Wizard 클래스 버튼
+        const wizardButton = this.add.image(width * 0.05, height * 0.1, 'class_wizard').setOrigin(0, 0.5);
         const wizScale = Math.min((width * 0.08) / this.textures.get('class_wizard').getSourceImage().width, 1);
         wizardButton.setScale(wizScale);
+        class_['wizard'] = wizardButton;
 
-        // 좌측 상단 astronomer 클래스 버튼 (wizard 버튼 옆에 배치)
-        const astronomerButton = this.add.image(width * 0.13, height * 0.1, 'class_astronomer')
-            .setOrigin(0, 0.5)
-            .setInteractive();
+        if (class_level['wizard'] > 0) {
+            wizardButton.setInteractive();
+            let wizardPressed = false;
+            wizardButton.on('pointerdown', () => {
+                wizardPressed = true;
+                updateClassTint('wizard', wizardPressed);
+            });
+            wizardButton.on('pointerup', (pointer) => {
+                if (wizardPressed && wizardButton.getBounds().contains(pointer.x, pointer.y)) {
+                    setNowClass('wizard');
+                    for (const key in class_) updateClassTint(key, false);
+                }
+                wizardPressed = false;
+                updateClassTint('wizard', false);
+            });
+            wizardButton.on('pointerout', () => {
+                wizardPressed = false;
+                updateClassTint('wizard', false);
+            });
+        }
+
+        // Astronomer 클래스 버튼
+        const astronomerButton = this.add.image(width * 0.13, height * 0.1, 'class_astronomer').setOrigin(0, 0.5);
         const astrScale = Math.min((width * 0.08) / this.textures.get('class_astronomer').getSourceImage().width, 1);
         astronomerButton.setScale(astrScale);
-
-        // 버튼들을 class_ 객체에 추가
-        class_['wizard'] = wizardButton;
         class_['astronomer'] = astronomerButton;
 
-        let wizardPressed = false;
-        let astronomerPressed = false;
-
-        wizardButton.on('pointerdown', () => {
-            wizardPressed = true;
-            updateClassTint('wizard', wizardPressed);
-        });
-        wizardButton.on('pointerup', (pointer) => {
-            if (wizardPressed && wizardButton.getBounds().contains(pointer.x, pointer.y)) {
-                setNowClass('wizard');
-                // 모든 클래스 버튼 tint 업데이트
-                for (const key in class_) {
-                    updateClassTint(key, false);
+        if (class_level['astronomer'] > 0) {
+            astronomerButton.setInteractive();
+            let astronomerPressed = false;
+            astronomerButton.on('pointerdown', () => {
+                astronomerPressed = true;
+                updateClassTint('astronomer', astronomerPressed);
+            });
+            astronomerButton.on('pointerup', (pointer) => {
+                if (astronomerPressed && astronomerButton.getBounds().contains(pointer.x, pointer.y)) {
+                    setNowClass('astronomer');
+                    for (const key in class_) updateClassTint(key, false);
                 }
-            }
-            wizardPressed = false;
-            updateClassTint('wizard', false);
-        });
-        wizardButton.on('pointerout', () => {
-            wizardPressed = false;
-            updateClassTint('wizard', false);
-        });
-
-        astronomerButton.on('pointerdown', () => {
-            astronomerPressed = true;
-            updateClassTint('astronomer', astronomerPressed);
-        });
-        astronomerButton.on('pointerup', (pointer) => {
-            if (astronomerPressed && astronomerButton.getBounds().contains(pointer.x, pointer.y)) {
-                setNowClass('astronomer');
-                // 모든 클래스 버튼 tint 업데이트
-                for (const key in class_) {
-                    updateClassTint(key, false);
-                }
-            }
-            astronomerPressed = false;
-            updateClassTint('astronomer', false);
-        });
-        astronomerButton.on('pointerout', () => {
-            astronomerPressed = false;
-            updateClassTint('astronomer', false);
-        });
+                astronomerPressed = false;
+                updateClassTint('astronomer', false);
+            });
+            astronomerButton.on('pointerout', () => {
+                astronomerPressed = false;
+                updateClassTint('astronomer', false);
+            });
+        }
 
         // 초기 tint 설정
         updateClassTint('wizard', false);
