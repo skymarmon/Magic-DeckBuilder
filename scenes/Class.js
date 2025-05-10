@@ -1,3 +1,5 @@
+let now_class = ''; // 전역 변수
+
 export default class Class extends Phaser.Scene {
     constructor() {
         super('Class');
@@ -6,11 +8,16 @@ export default class Class extends Phaser.Scene {
     create() {
         const { width, height } = this.sys.game.canvas;
 
+        // now_class 값이 없으면 기본값으로 'wizard' 설정
+        if (!now_class) {
+            now_class = 'wizard';
+        }
+
         // 배경
         const bg = this.add.rectangle(0, 0, width, height, 0x222222).setOrigin(0);
 
         // 중앙 상단 텍스트 ('학파 선택') - JejuHallasan 폰트 적용
-        const titleText = this.add.text(width * 0.8, height * 0.2, '학파 선택', {
+        const titleText = this.add.text(width / 2, height * 0.1, '학파 선택', {
             fontFamily: 'JejuHallasan',
             fontSize: `${Math.floor(height * 0.06)}px`,
             color: '#ffffff',
@@ -23,7 +30,7 @@ export default class Class extends Phaser.Scene {
             .setInteractive();
 
         const biw = this.textures.get('class_backspace').getSourceImage().width;
-        const backScale = Math.min((width * 0.06) / biw, 1);
+        const backScale = Math.min((width * 0.08) / biw, 1);
         backButton.setScale(backScale);
 
         let backPressed = false;
@@ -43,30 +50,42 @@ export default class Class extends Phaser.Scene {
             backButton.clearTint();
         });
 
-        // 우측 하단 location 버튼
-        const locationButton = this.add.image(width * 0.95, height * 0.95, 'button_location')
-            .setOrigin(1, 1)
+        // 좌측 상단 wizard 버튼
+        const wizardButton = this.add.image(width * 0.05, height * 0.1, 'class_wizard')
+            .setOrigin(0, 0.5)
             .setInteractive();
 
-        const liw = this.textures.get('button_location').getSourceImage().width;
-        const locationScale = Math.min((width * 0.2) / liw, 1);
-        locationButton.setScale(locationScale);
+        const wiw = this.textures.get('class_wizard').getSourceImage().width;
+        const wizardScale = Math.min((width * 0.08) / wiw, 1);
+        wizardButton.setScale(wizardScale);
 
-        let locationPressed = false;
-        locationButton.on('pointerdown', () => {
-            locationPressed = true;
-            locationButton.setTint(0xaaaaaa);
+        let wizardPressed = false;
+        wizardButton.on('pointerdown', () => {
+            wizardPressed = true;
+            wizardButton.setTint(0xaaaaaa);
         });
-        locationButton.on('pointerup', (pointer) => {
-            if (locationPressed && locationButton.getBounds().contains(pointer.x, pointer.y)) {
-                this.scene.start('Location');
+        wizardButton.on('pointerup', (pointer) => {
+            if (wizardPressed && wizardButton.getBounds().contains(pointer.x, pointer.y)) {
+                now_class = 'wizard'; // 클릭 시 wizard 값 할당
+                this.updateWizardButtonColor(wizardButton); // wizard 버튼 색상 업데이트
             }
-            locationPressed = false;
-            locationButton.clearTint();
+            wizardPressed = false;
+            wizardButton.clearTint();
         });
-        locationButton.on('pointerout', () => {
-            locationPressed = false;
-            locationButton.clearTint();
+        wizardButton.on('pointerout', () => {
+            wizardPressed = false;
+            wizardButton.clearTint();
         });
+
+        // wizard 버튼 색상 업데이트 (now_class 값에 따른 색 변경)
+        this.updateWizardButtonColor(wizardButton);
+    }
+
+    updateWizardButtonColor(button) {
+        if (now_class === 'wizard') {
+            button.setTint(0xFFFFCC); // 연한 노란색
+        } else {
+            button.clearTint();
+        }
     }
 }
