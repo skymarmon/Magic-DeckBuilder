@@ -36,6 +36,9 @@ export default class Images extends Phaser.Scene {
         this.load.image('class_battlemage', 'assets/images/class_battlemage.png');
         this.load.image('class_warlord', 'assets/images/class_warlord.png');
         this.load.image('class_blackmage', 'assets/images/class_blackmage.png');
+        this.load.image('location_name', 'assets/images/location_name.png');
+        this.load.image('location_info', 'assets/images/location_info.png');
+        this.load.image('button_game', 'assets/images/button_game.png');
     }
 
     create() {
