@@ -72,41 +72,50 @@ export default class Class extends Phaser.Scene {
             locationButton.clearTint();
         });
 
-        // 클래스 목록 및 순서
-        const classList = ['wizard', 'astronomer', 'cryomancer', 'shaman', 'warlock', 'arcanist'];
+        // 2줄로 구성된 클래스 목록
+        const classRows = [
+            ['wizard', 'astronomer', 'cryomancer', 'shaman', 'warlock', 'arcanist'],
+            ['summoner', 'bishop', 'occultist', 'druid', 'pyromancer', 'sorcerer']
+        ];
 
-        classList.forEach((classname, index) => {
-            const x = width * (0.05 + 0.08 * index);  // 간격 0.08씩
-            const button = this.add.image(x, height * 0.1, `class_${classname}`).setOrigin(0, 0.5);
-            const scale = Math.min((width * 0.08) / this.textures.get(`class_${classname}`).getSourceImage().width, 1);
-            button.setScale(scale);
-            class_[classname] = button;
+        classRows.forEach((row, rowIndex) => {
+            row.forEach((classname, colIndex) => {
+                const x = width * (0.05 + 0.15 * colIndex);
+                const y = height * (0.1 + 0.15 * rowIndex);
 
-            if (class_level[classname] > 0) {
-                button.setInteractive();
-                let pressed = false;
-                button.on('pointerdown', () => {
-                    pressed = true;
-                    updateClassTint(classname, true);
-                });
-                button.on('pointerup', (pointer) => {
-                    if (pressed && button.getBounds().contains(pointer.x, pointer.y)) {
-                        setNowClass(classname);
-                        for (const key in class_) updateClassTint(key, false);
-                    }
-                    pressed = false;
-                    updateClassTint(classname, false);
-                });
-                button.on('pointerout', () => {
-                    pressed = false;
-                    updateClassTint(classname, false);
-                });
-            }
+                const button = this.add.image(x, y, `class_${classname}`).setOrigin(0, 0.5);
+                const scale = Math.min((width * 0.08) / this.textures.get(`class_${classname}`).getSourceImage().width, 1);
+                button.setScale(scale);
+                class_[classname] = button;
+
+                if (class_level[classname] > 0) {
+                    button.setInteractive();
+                    let pressed = false;
+                    button.on('pointerdown', () => {
+                        pressed = true;
+                        updateClassTint(classname, true);
+                    });
+                    button.on('pointerup', (pointer) => {
+                        if (pressed && button.getBounds().contains(pointer.x, pointer.y)) {
+                            setNowClass(classname);
+                            for (const key in class_) updateClassTint(key, false);
+                        }
+                        pressed = false;
+                        updateClassTint(classname, false);
+                    });
+                    button.on('pointerout', () => {
+                        pressed = false;
+                        updateClassTint(classname, false);
+                    });
+                }
+            });
         });
 
         // 초기 tint 설정
-        for (const key of classList) {
-            updateClassTint(key, false);
+        for (const row of classRows) {
+            for (const classname of row) {
+                updateClassTint(classname, false);
+            }
         }
     }
 }
