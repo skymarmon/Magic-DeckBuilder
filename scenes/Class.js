@@ -1,4 +1,5 @@
-// class.js
+import { updateClassTint } from './main';
+
 export default class Class extends Phaser.Scene {
     constructor() {
         super('Class');
