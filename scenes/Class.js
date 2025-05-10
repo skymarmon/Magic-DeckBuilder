@@ -39,7 +39,7 @@ export default class Class extends Phaser.Scene {
         });
         backButton.on('pointerup', (pointer) => {
             if (backPressed && backButton.getBounds().contains(pointer.x, pointer.y)) {
-                this.scene.start('Lobby', fromLicense = false);
+                this.scene.start('Lobby', { fromLicense: false });
             }
             backPressed = false;
             backButton.clearTint();
