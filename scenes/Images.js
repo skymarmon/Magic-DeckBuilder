@@ -39,6 +39,7 @@ export default class Images extends Phaser.Scene {
         this.load.image('location_name', 'assets/images/location_name.png');
         this.load.image('location_info', 'assets/images/location_info.png');
         this.load.image('button_game', 'assets/images/button_game.png');
+        this.load.image('location_backspace', 'assets/images/location_backspace.png');
     }
 
     create() {
