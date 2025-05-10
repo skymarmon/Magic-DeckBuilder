@@ -13,7 +13,7 @@ export default class Class extends Phaser.Scene {
         const text = this.add.image(width / 2, height * 0.1, 'text_choose_class');
         const iw = this.textures.get('text_choose_class').getSourceImage().width;
         const ih = this.textures.get('text_choose_class').getSourceImage().height;
-        const scale = Math.min((width * 0.6) / iw, 1); // 최대 60% 너비
+        const scale = Math.min((width * 0.3) / iw, 1); // 최대 60% 너비
         text.setScale(scale);
 
         // 우측 상단 backspace 버튼

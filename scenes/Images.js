@@ -10,6 +10,7 @@ export default class Images extends Phaser.Scene {
         this.load.image('button_start', 'assets/images/button_start.png');
         this.load.image('button_record', 'assets/images/button_record.png');
         this.load.image('text_choose_class', 'assets/images/text_choose_class.png');
+        this.load.image('class_backspace', 'assets/images/class_backspace.png');
     }
 
     create() {
