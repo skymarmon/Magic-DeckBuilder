@@ -16,12 +16,12 @@ export default class Class extends Phaser.Scene {
             setNowClass('wizard');
         }
 
-        const classText = class_name[getNowClass()] || "Class Selection";
-        this.add.text(width * 0.75, height * 0.1, classText, {
+        this.add.text(width * 0.75, height * 0.1, class_name[getNowClass()] || "Class Selection", {
             fontFamily: 'JejuHallasan',
             fontSize: `${Math.floor(width * 0.04)}px`,
             color: '#ffffff'
         }).setOrigin(0.5);
+
 
         // 뒤로가기 버튼
         const backButton = this.add.image(width * 0.97, height * 0.07, 'class_backspace')
@@ -82,7 +82,7 @@ export default class Class extends Phaser.Scene {
         const colCount = 6;
         const rowCount = 4;
         const xStart = width * 0.05;
-        const xGap = width * 0.07;
+        const xGap = width * 0.1;
         const yStart = height * 0.22;
         const yGap = height * 0.18;
 
@@ -106,6 +106,7 @@ export default class Class extends Phaser.Scene {
                     button.on('pointerup', (pointer) => {
                         if (pressed && button.getBounds().contains(pointer.x, pointer.y)) {
                             setNowClass(classname);
+                            this.classTitleText.setText(class_name[classname] || "Class Selection");
                             for (const key in class_) updateClassTint(key, false);
                         }
                         pressed = false;
