@@ -82,7 +82,7 @@ export default class Class extends Phaser.Scene {
         const colCount = 6;
         const rowCount = 4;
         const xStart = width * 0.05;
-        const xGap = width * 0.14;
+        const xGap = width * 0.07;
         const yStart = height * 0.22;
         const yGap = height * 0.18;
 
