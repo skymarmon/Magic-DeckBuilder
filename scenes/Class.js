@@ -17,8 +17,9 @@ export default class Class extends Phaser.Scene {
         text.setScale(scale);
 
         // 우측 상단 backspace 버튼
-        const backButton = this.add.image(width * 0.95, height * 0.05, 'class_backspace')
+        const backButton = this.add.image(width * 0.95, height * 0.1, 'class_backspace')
             .setOrigin(1, 0.5)
+            .setScale(scale * 0.5)
             .setInteractive();
 
         const biw = this.textures.get('class_backspace').getSourceImage().width;
