@@ -1,5 +1,3 @@
-// Class.js
-
 import { updateClassTint, class_, class_level, class_name, getNowClass, setNowClass } from '../main.js';
 
 export default class Class extends Phaser.Scene {
@@ -18,8 +16,9 @@ export default class Class extends Phaser.Scene {
             setNowClass('wizard');
         }
 
+        // class_name에 맞는 텍스트를 중앙 상단에 표시
         const classText = class_name[getNowClass()] || "Class Selection";
-        this.add.text(width / 2, height * 0.1, classText, {
+        this.add.text(width * 0.75, height * 0.1, classText, {
             fontFamily: 'JejuHallasan',
             fontSize: `${Math.floor(width * 0.04)}px`,
             color: '#ffffff'
@@ -73,62 +72,41 @@ export default class Class extends Phaser.Scene {
             locationButton.clearTint();
         });
 
-        // Wizard 클래스 버튼
-        const wizardButton = this.add.image(width * 0.05, height * 0.1, 'class_wizard').setOrigin(0, 0.5);
-        const wizScale = Math.min((width * 0.08) / this.textures.get('class_wizard').getSourceImage().width, 1);
-        wizardButton.setScale(wizScale);
-        class_['wizard'] = wizardButton;
+        // 클래스 목록 및 순서
+        const classList = ['wizard', 'astronomer', 'cryomancer', 'shaman', 'warlock', 'arcanist'];
 
-        if (class_level['wizard'] > 0) {
-            wizardButton.setInteractive();
-            let wizardPressed = false;
-            wizardButton.on('pointerdown', () => {
-                wizardPressed = true;
-                updateClassTint('wizard', wizardPressed);
-            });
-            wizardButton.on('pointerup', (pointer) => {
-                if (wizardPressed && wizardButton.getBounds().contains(pointer.x, pointer.y)) {
-                    setNowClass('wizard');
-                    for (const key in class_) updateClassTint(key, false);
-                }
-                wizardPressed = false;
-                updateClassTint('wizard', false);
-            });
-            wizardButton.on('pointerout', () => {
-                wizardPressed = false;
-                updateClassTint('wizard', false);
-            });
-        }
+        classList.forEach((classname, index) => {
+            const x = width * (0.05 + 0.08 * index);  // 간격 0.08씩
+            const button = this.add.image(x, height * 0.1, `class_${classname}`).setOrigin(0, 0.5);
+            const scale = Math.min((width * 0.08) / this.textures.get(`class_${classname}`).getSourceImage().width, 1);
+            button.setScale(scale);
+            class_[classname] = button;
 
-        // Astronomer 클래스 버튼
-        const astronomerButton = this.add.image(width * 0.13, height * 0.1, 'class_astronomer').setOrigin(0, 0.5);
-        const astrScale = Math.min((width * 0.08) / this.textures.get('class_astronomer').getSourceImage().width, 1);
-        astronomerButton.setScale(astrScale);
-        class_['astronomer'] = astronomerButton;
-
-        if (class_level['astronomer'] > 0) {
-            astronomerButton.setInteractive();
-            let astronomerPressed = false;
-            astronomerButton.on('pointerdown', () => {
-                astronomerPressed = true;
-                updateClassTint('astronomer', astronomerPressed);
-            });
-            astronomerButton.on('pointerup', (pointer) => {
-                if (astronomerPressed && astronomerButton.getBounds().contains(pointer.x, pointer.y)) {
-                    setNowClass('astronomer');
-                    for (const key in class_) updateClassTint(key, false);
-                }
-                astronomerPressed = false;
-                updateClassTint('astronomer', false);
-            });
-            astronomerButton.on('pointerout', () => {
-                astronomerPressed = false;
-                updateClassTint('astronomer', false);
-            });
-        }
+            if (class_level[classname] > 0) {
+                button.setInteractive();
+                let pressed = false;
+                button.on('pointerdown', () => {
+                    pressed = true;
+                    updateClassTint(classname, true);
+                });
+                button.on('pointerup', (pointer) => {
+                    if (pressed && button.getBounds().contains(pointer.x, pointer.y)) {
+                        setNowClass(classname);
+                        for (const key in class_) updateClassTint(key, false);
+                    }
+                    pressed = false;
+                    updateClassTint(classname, false);
+                });
+                button.on('pointerout', () => {
+                    pressed = false;
+                    updateClassTint(classname, false);
+                });
+            }
+        });
 
         // 초기 tint 설정
-        updateClassTint('wizard', false);
-        updateClassTint('astronomer', false);
+        for (const key of classList) {
+            updateClassTint(key, false);
+        }
     }
 }

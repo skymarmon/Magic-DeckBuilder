@@ -14,6 +14,10 @@ export default class Images extends Phaser.Scene {
         this.load.image('button_location', 'assets/images/button_location.png');
         this.load.image('class_wizard', 'assets/images/class_wizard.png');
         this.load.image('class_astronomer', 'assets/images/class_astronomer.png');
+        this.load.image('class_cryomancer', 'assets/images/class_cryomancer.png');
+        this.load.image('class_shaman', 'assets/images/class_shaman.png');
+        this.load.image('class_warlock', 'assets/images/class_warlock.png');
+        this.load.image('class_arcanist', 'assets/images/class_arcanist.png');
     }
 
     create() {
