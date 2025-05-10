@@ -15,7 +15,7 @@ export default class Class extends Phaser.Scene {
         const ih = this.textures.get('text_choose_class').getSourceImage().height;
 
         // 가로 너비의 60%를 기준으로 스케일 설정 (또는 필요에 따라 조정 가능)
-        const scale = Math.min((width * 0.6) / iw, 1);
+        const scale = Math.min((width * 0.3) / iw, 1);
         text.setScale(scale);
     }
 }
