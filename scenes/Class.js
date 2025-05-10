@@ -19,17 +19,17 @@ export default class Class extends Phaser.Scene {
         }
 
         // 중앙 상단 텍스트
-        this.add.text(width / 2, height * 0.1, '학파 선택', {
+        this.add.text(width * 0.75, height * 0.1, '학파 선택', {
             fontFamily: 'JejuHallasan',
             fontSize: `${Math.floor(width * 0.04)}px`,
             color: '#ffffff'
         }).setOrigin(0.5);
 
         // 뒤로가기 버튼
-        const backButton = this.add.image(width * 0.95, height * 0.1, 'class_backspace')
+        const backButton = this.add.image(width * 0.97, height * 0.07, 'class_backspace')
             .setOrigin(1, 0.5)
             .setInteractive();
-        const backScale = Math.min((width * 0.08) / this.textures.get('class_backspace').getSourceImage().width, 1);
+        const backScale = Math.min((width * 0.05) / this.textures.get('class_backspace').getSourceImage().width, 1);
         backButton.setScale(backScale);
 
         let backPressed = false;
@@ -50,10 +50,10 @@ export default class Class extends Phaser.Scene {
         });
 
         // Location 버튼
-        const locationButton = this.add.image(width * 0.95, height * 0.95, 'button_location')
+        const locationButton = this.add.image(width * 0.9, height * 0.9, 'button_location')
             .setOrigin(1, 1)
             .setInteractive();
-        const locScale = Math.min((width * 0.08) / this.textures.get('button_location').getSourceImage().width, 1);
+        const locScale = Math.min((width * 0.2) / this.textures.get('button_location').getSourceImage().width, 1);
         locationButton.setScale(locScale);
 
         let locPressed = false;
