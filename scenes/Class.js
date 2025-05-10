@@ -3,6 +3,6 @@ export default class Class extends Phaser.Scene {
         super('Class');
     }
     create() {
-        this.add.text(400, 300, '에에에Class Scene', { fontSize: '32px', color: '#fff' }).setOrigin(0.5);
+        this.add.text(400, 300, '에에에Class Scene', { fontFamily: 'JejuHallasan', fontSize: '32px', color: '#fff' }).setOrigin(0.5);
     }
 }
