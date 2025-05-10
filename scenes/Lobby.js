@@ -30,7 +30,7 @@ export default class Lobby extends Phaser.Scene {
         });
         button_start.on('pointerup', (pointer, localX, localY, event) => {
             if (startPressed && button_start.getBounds().contains(pointer.x, pointer.y)) {
-                this.scene.start('Class');
+                this.scene.start('Class', { fromLicense: false });
             }
             startPressed = false;
             button_start.clearTint();
@@ -48,7 +48,7 @@ export default class Lobby extends Phaser.Scene {
         });
         button_research.on('pointerup', (pointer) => {
             if (researchPressed && button_research.getBounds().contains(pointer.x, pointer.y)) {
-                this.scene.start('Research');
+                this.scene.start('Research', { fromLicense: false });
             }
             researchPressed = false;
             button_research.clearTint();
@@ -66,7 +66,7 @@ export default class Lobby extends Phaser.Scene {
         });
         button_record.on('pointerup', (pointer) => {
             if (recordPressed && button_record.getBounds().contains(pointer.x, pointer.y)) {
-                this.scene.start('Record');
+                this.scene.start('Record', { fromLicense: false });
             }
             recordPressed = false;
             button_record.clearTint();
