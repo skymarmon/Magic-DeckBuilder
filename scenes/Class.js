@@ -16,7 +16,7 @@ export default class Class extends Phaser.Scene {
             setNowClass('wizard');
         }
 
-        this.add.text(width * 0.75, height * 0.1, class_name[getNowClass()] || "Class Selection", {
+        this.classTitleText = this.add.text(width * 0.75, height * 0.1, class_name[getNowClass()] || "Class Selection", {
             fontFamily: 'JejuHallasan',
             fontSize: `${Math.floor(width * 0.04)}px`,
             color: '#ffffff'
@@ -82,7 +82,7 @@ export default class Class extends Phaser.Scene {
         const colCount = 6;
         const rowCount = 4;
         const xStart = width * 0.05;
-        const xGap = width * 0.1;
+        const xGap = width * 0.09;
         const yStart = height * 0.22;
         const yGap = height * 0.18;
 
