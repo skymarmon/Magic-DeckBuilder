@@ -22,7 +22,7 @@ export default class Lobby extends Phaser.Scene {
         const baseX = width / 2 + displayWidth / 2;
         const baseY = height / 2 + displayHeight / 2;
 
-        const button_start = this.add.image(baseX - 0.26 * iw, baseY - 0.26 * ih, 'button_start').setScale(2.1 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_start = this.add.image(baseX - 0.26 * iw * scale, baseY - 0.26 * ih * scale, 'button_start').setScale(2.1 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
         button_start.on('pointerdown', () => button_start.setTint(0xaaaaaa));
         button_start.on('pointerup', () => {
             button_start.clearTint();
