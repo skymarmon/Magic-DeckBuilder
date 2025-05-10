@@ -1,5 +1,4 @@
-let now_class = ''; // 전역 변수
-
+// class.js
 export default class Class extends Phaser.Scene {
     constructor() {
         super('Class');
@@ -8,23 +7,20 @@ export default class Class extends Phaser.Scene {
     create() {
         const { width, height } = this.sys.game.canvas;
 
-        // now_class 값이 없으면 기본값으로 'wizard' 설정
-        if (!now_class) {
-            now_class = 'wizard';
-        }
+        if (!window.now_class) window.now_class = 'wizard';
+        if (!window.class_level) window.class_level = {};
+        if (!window.class_) window.class_ = {};
 
-        // 배경
         const bg = this.add.rectangle(0, 0, width, height, 0x222222).setOrigin(0);
 
-        // 중앙 상단 텍스트 ('학파 선택') - JejuHallasan 폰트 적용
-        const titleText = this.add.text(width / 2, height * 0.1, '학파 선택', {
+        // 중앙 상단 텍스트
+        const title = this.add.text(width / 2, height * 0.1, '학파 선택', {
             fontFamily: 'JejuHallasan',
-            fontSize: `${Math.floor(height * 0.06)}px`,
-            color: '#ffffff',
-            align: 'center'
+            fontSize: `${Math.round(height * 0.05)}px`,
+            color: '#ffffff'
         }).setOrigin(0.5);
 
-        // 우측 상단 backspace 버튼
+        // backspace 버튼 (우상단)
         const backButton = this.add.image(width * 0.95, height * 0.1, 'class_backspace')
             .setOrigin(1, 0.5)
             .setInteractive();
@@ -34,10 +30,12 @@ export default class Class extends Phaser.Scene {
         backButton.setScale(backScale);
 
         let backPressed = false;
+
         backButton.on('pointerdown', () => {
             backPressed = true;
             backButton.setTint(0xaaaaaa);
         });
+
         backButton.on('pointerup', (pointer) => {
             if (backPressed && backButton.getBounds().contains(pointer.x, pointer.y)) {
                 this.scene.start('Lobby', { fromLicense: false });
@@ -45,12 +43,43 @@ export default class Class extends Phaser.Scene {
             backPressed = false;
             backButton.clearTint();
         });
+
         backButton.on('pointerout', () => {
             backPressed = false;
             backButton.clearTint();
         });
 
-        // 좌측 상단 wizard 버튼
+        // location 버튼 (우하단)
+        const locationButton = this.add.image(width * 0.95, height * 0.95, 'button_location')
+            .setOrigin(1, 1)
+            .setInteractive();
+
+        const liw = this.textures.get('button_location').getSourceImage().width;
+        const locationScale = Math.min((width * 0.08) / liw, 1);
+        locationButton.setScale(locationScale);
+
+        let locationPressed = false;
+
+        locationButton.on('pointerdown', () => {
+            locationPressed = true;
+            locationButton.setTint(0xaaaaaa);
+        });
+
+        locationButton.on('pointerup', (pointer) => {
+            if (locationPressed && locationButton.getBounds().contains(pointer.x, pointer.y)) {
+                this.scene.start('Location');
+            }
+            locationPressed = false;
+            locationButton.clearTint();
+        });
+
+        locationButton.on('pointerout', () => {
+            locationPressed = false;
+            locationButton.clearTint();
+        });
+
+        // wizard 버튼 (좌상단)
+        let wizardPressed = false;
         const wizardButton = this.add.image(width * 0.05, height * 0.1, 'class_wizard')
             .setOrigin(0, 0.5)
             .setInteractive();
@@ -59,33 +88,24 @@ export default class Class extends Phaser.Scene {
         const wizardScale = Math.min((width * 0.08) / wiw, 1);
         wizardButton.setScale(wizardScale);
 
-        let wizardPressed = false;
         wizardButton.on('pointerdown', () => {
             wizardPressed = true;
-            wizardButton.setTint(0xaaaaaa);
+            updateClassTint('wizard', true);
         });
+
         wizardButton.on('pointerup', (pointer) => {
             if (wizardPressed && wizardButton.getBounds().contains(pointer.x, pointer.y)) {
-                now_class = 'wizard'; // 클릭 시 wizard 값 할당
-                this.updateWizardButtonColor(wizardButton); // wizard 버튼 색상 업데이트
+                now_class = 'wizard';
             }
             wizardPressed = false;
-            wizardButton.clearTint();
+            updateClassTint('wizard', false);
         });
+
         wizardButton.on('pointerout', () => {
             wizardPressed = false;
-            wizardButton.clearTint();
+            updateClassTint('wizard', false);
         });
 
-        // wizard 버튼 색상 업데이트 (now_class 값에 따른 색 변경)
-        this.updateWizardButtonColor(wizardButton);
-    }
-
-    updateWizardButtonColor(button) {
-        if (now_class === 'wizard') {
-            button.setTint(0xFFFFCC); // 연한 노란색
-        } else {
-            button.clearTint();
-        }
+        updateClassTint('wizard', false);
     }
 }
