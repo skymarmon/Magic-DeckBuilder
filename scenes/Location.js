@@ -31,10 +31,16 @@ export default class Location extends Phaser.Scene {
         });
         gameButton.on('pointerup', (pointer) => {
             if (gamePressed && gameButton.getBounds().contains(pointer.x, pointer.y)) {
-                this.scene.start('Field');
+                gameButton.clearTint();
+                // 페이드아웃 후 Field 씬으로 이동
+                this.cameras.main.fadeOut(500, 0, 0, 0); // 0.5초 동안 검은색 페이드
+                this.cameras.main.once('camerafadeoutcomplete', () => {
+                    this.scene.start('Field');
+                });
+            } else {
+                gamePressed = false;
+                gameButton.clearTint();
             }
-            gamePressed = false;
-            gameButton.clearTint();
         });
         gameButton.on('pointerout', () => {
             gamePressed = false;
