@@ -48,7 +48,7 @@ export default class Class extends Phaser.Scene {
         });
 
         // Location 버튼
-        const locationButton = this.add.image(width * 0.8, height * 0.9, 'button_location')
+        const locationButton = this.add.image(width * 0.9, height * 0.9, 'button_location')
             .setOrigin(1, 1)
             .setInteractive();
         const locScale = Math.min((width * 0.2) / this.textures.get('button_location').getSourceImage().width, 1);
