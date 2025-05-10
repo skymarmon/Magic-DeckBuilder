@@ -68,15 +68,6 @@ export function updateClassTint(classname, ifPressed) {
     button.setTint(baseColor);
 }
 
-Phaser.GameObjects.GameObjectFactory.prototype.addText = function (x, y, text, style = {}) {
-    const defaultStyle = {
-        fontFamily: 'JejuHallasan',
-        fontSize: '24px',
-        color: '#000000'
-    };
-    return this.scene.add.text(x, y, text, Object.assign(defaultStyle, style));
-};
-
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
