@@ -15,10 +15,10 @@ import WinLose from './scenes/WinLose.js';
 
 export let class_level = {
     wizard: 1,
-    astronomer: 0,
-    cryomancer: 0,
-    shaman: 0,
-    warlock: 0,
+    astronomer: 2,
+    cryomancer: 3,
+    shaman: 4,
+    warlock: 5,
     arcanist: 0,
     summoner: 0,
     bishop: 0,
