@@ -16,7 +16,7 @@ export default class Class extends Phaser.Scene {
             setNowClass('wizard');
         }
 
-        this.classTitleText = this.add.text(width * 0.75, height * 0.1, class_name[getNowClass()] || "Class Selection", {
+        this.classTitleText = this.add.text(width * 0.75, height * 0.13, class_name[getNowClass()] || "Class Selection", {
             fontFamily: 'JejuHallasan',
             fontSize: `${Math.floor(width * 0.04)}px`,
             color: '#ffffff'

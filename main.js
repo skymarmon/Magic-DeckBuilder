@@ -88,15 +88,15 @@ export function updateClassTint(classname, ifPressed) {
     let baseColor;
 
     if (getNowClass() === classname) {
-        baseColor = 0xffffcc; // 연노랑
+        baseColor = 0xF8F9D8; // 연노랑
     } else {
         switch (level) {
-            case 0: baseColor = 0x555555; break; // 회색
+            case 0: baseColor = 0x3B3B3B; break; // 회색
             case 1: baseColor = 0xffffff; break; // 흰색
-            case 2: baseColor = 0xccffcc; break; // 연두
-            case 3: baseColor = 0x9999ff; break; // 파랑
-            case 4: baseColor = 0xffccff; break; // 분홍
-            case 5: baseColor = 0xffff99; break; // 노랑
+            case 2: baseColor = 0xC8FFB5; break; // 연두
+            case 3: baseColor = 0xC8E4FC; break; // 파랑
+            case 4: baseColor = 0xFFC8DD; break; // 분홍
+            case 5: baseColor = 0xFFDC88; break; // 노랑
             default: baseColor = 0xffffff;
         }
     }
