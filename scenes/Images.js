@@ -24,6 +24,18 @@ export default class Images extends Phaser.Scene {
         this.load.image('class_druid', 'assets/images/class_druid.png');
         this.load.image('class_pyromancer', 'assets/images/class_pyromancer.png');
         this.load.image('class_sorcerer', 'assets/images/class_sorcerer.png');
+        this.load.image('class_alchemist', 'assets/images/class_alchemist.png');
+        this.load.image('class_scholar', 'assets/images/class_scholar.png');
+        this.load.image('class_witch', 'assets/images/class_witch.png');
+        this.load.image('class_electromancer', 'assets/images/class_electromancer.png');
+        this.load.image('class_arbiter', 'assets/images/class_arbiter.png');
+        this.load.image('class_archmage', 'assets/images/class_archmage.png');
+        this.load.image('class_archaeologist', 'assets/images/class_archaeologist.png');
+        this.load.image('class_magician', 'assets/images/class_magician.png');
+        this.load.image('class_mage', 'assets/images/class_mage.png');
+        this.load.image('class_battlemage', 'assets/images/class_battlemage.png');
+        this.load.image('class_warlord', 'assets/images/class_warlord.png');
+        this.load.image('class_blackmage', 'assets/images/class_blackmage.png');
     }
 
     create() {

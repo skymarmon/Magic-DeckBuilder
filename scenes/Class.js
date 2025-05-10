@@ -16,7 +16,6 @@ export default class Class extends Phaser.Scene {
             setNowClass('wizard');
         }
 
-        // class_name에 맞는 텍스트를 중앙 상단에 표시
         const classText = class_name[getNowClass()] || "Class Selection";
         this.add.text(width * 0.75, height * 0.1, classText, {
             fontFamily: 'JejuHallasan',
@@ -72,16 +71,25 @@ export default class Class extends Phaser.Scene {
             locationButton.clearTint();
         });
 
-        // 2줄로 구성된 클래스 목록
-        const classRows = [
+        // 클래스 목록 (4행 6열)
+        const classGrid = [
             ['wizard', 'astronomer', 'cryomancer', 'shaman', 'warlock', 'arcanist'],
-            ['summoner', 'bishop', 'occultist', 'druid', 'pyromancer', 'sorcerer']
+            ['summoner', 'bishop', 'occultist', 'druid', 'pyromancer', 'sorcerer'],
+            ['alchemist', 'scholar', 'witch', 'electromancer', 'arbiter', 'archmage'],
+            ['archaeologist', 'magician', 'mage', 'battlemage', 'warlord', 'blackmage']
         ];
 
-        classRows.forEach((row, rowIndex) => {
+        const colCount = 6;
+        const rowCount = 4;
+        const xStart = width * 0.05;
+        const xGap = width * 0.14;
+        const yStart = height * 0.22;
+        const yGap = height * 0.18;
+
+        classGrid.forEach((row, rowIndex) => {
             row.forEach((classname, colIndex) => {
-                const x = width * (0.05 + 0.15 * colIndex);
-                const y = height * (0.1 + 0.15 * rowIndex);
+                const x = xStart + xGap * colIndex;
+                const y = yStart + yGap * rowIndex;
 
                 const button = this.add.image(x, y, `class_${classname}`).setOrigin(0, 0.5);
                 const scale = Math.min((width * 0.08) / this.textures.get(`class_${classname}`).getSourceImage().width, 1);
@@ -112,7 +120,7 @@ export default class Class extends Phaser.Scene {
         });
 
         // 초기 tint 설정
-        for (const row of classRows) {
+        for (const row of classGrid) {
             for (const classname of row) {
                 updateClassTint(classname, false);
             }
