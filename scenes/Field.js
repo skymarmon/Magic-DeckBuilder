@@ -19,7 +19,6 @@ export default class Field extends Phaser.Scene {
         const worldSize = 100000;
         this.physics.world.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
-        // 플레이어
         this.player = this.physics.add.image(0, 0, 'field_character');
         this.player.setCollideWorldBounds(true);
         this.player.setDamping(true);
@@ -40,14 +39,8 @@ export default class Field extends Phaser.Scene {
             right: Phaser.Input.Keyboard.KeyCodes.D,
         });
 
-        // RenderTexture를 사용한 시각적 배경 렌더링
-        this.rt = this.add.renderTexture(0, 0, width, height)
-            .setOrigin(0)
-            .setScrollFactor(0);
+        this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
 
-        this.rt.setDepth(-1);
-
-        // 그라데이션 스타일
         this.roomRadius = 400;
         this.corridorWidth = 240;
         this.roomDistance = 2400;
@@ -78,11 +71,9 @@ export default class Field extends Phaser.Scene {
         this.rt.clear();
         this.graphics.clear();
 
-        // 검은 배경
         this.graphics.fillStyle(0x000000, 1);
         this.graphics.fillRect(0, 0, width, height);
 
-        // 방과 복도 계산
         const viewLeft = cam.scrollX;
         const viewTop = cam.scrollY;
         const viewRight = cam.scrollX + width;
@@ -101,38 +92,20 @@ export default class Field extends Phaser.Scene {
                 const localX = cx - cam.scrollX;
                 const localY = cy - cam.scrollY;
 
-                // 방
-                const gradient = this.graphics.createRadialGradient(localX, localY, this.roomRadius * 0.7, localX, localY, this.roomRadius);
-                gradient.addColorStop(0, 'rgba(255,255,255,1)');
-                gradient.addColorStop(1, 'rgba(255,255,255,0)');
-                this.graphics.fillStyle(gradient);
-                this.graphics.fillCircle(localX, localY, this.roomRadius);
+                // 방: 투명도 계단식 처리
+                for (let r = this.roomRadius; r > 0; r -= 40) {
+                    const alpha = Phaser.Math.Linear(0, 1, r / this.roomRadius);
+                    this.graphics.fillStyle(0xffffff, alpha);
+                    this.graphics.fillCircle(localX, localY, r);
+                }
 
-                // 복도: 가로
-                const gradH = this.graphics.createLinearGradient(
-                    localX - this.roomDistance / 2, localY,
-                    localX + this.roomDistance / 2, localY
-                );
-                gradH.addColorStop(0, 'rgba(255,255,255,0)');
-                gradH.addColorStop(0.5, 'rgba(255,255,255,1)');
-                gradH.addColorStop(1, 'rgba(255,255,255,0)');
-                this.graphics.fillStyle(gradH);
+                // 복도: 단순 직사각형 (불투명)
+                this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillRect(localX - this.roomDistance / 2, localY - this.corridorWidth / 2, this.roomDistance, this.corridorWidth);
-
-                // 복도: 세로
-                const gradV = this.graphics.createLinearGradient(
-                    localX, localY - this.roomDistance / 2,
-                    localX, localY + this.roomDistance / 2
-                );
-                gradV.addColorStop(0, 'rgba(255,255,255,0)');
-                gradV.addColorStop(0.5, 'rgba(255,255,255,1)');
-                gradV.addColorStop(1, 'rgba(255,255,255,0)');
-                this.graphics.fillStyle(gradV);
                 this.graphics.fillRect(localX - this.corridorWidth / 2, localY - this.roomDistance / 2, this.corridorWidth, this.roomDistance);
             }
         }
 
-        // 렌더링 결과를 rt에 복사
         this.rt.draw(this.graphics);
     }
 }
