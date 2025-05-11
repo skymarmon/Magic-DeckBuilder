@@ -76,6 +76,10 @@ export default class Lobby extends Phaser.Scene {
             button_record.clearTint();
         });
 
+        button_start.setAlpha(0);
+        button_research.setAlpha(0);
+        button_record.setAlpha(0);
+
         if (this.fromLicense) {
             this.cameras.main.fadeIn(2000, 0, 0, 0);
         }
