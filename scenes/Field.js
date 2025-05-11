@@ -113,8 +113,7 @@ export default class Field extends Phaser.Scene {
             const { x, y } = nearest4[i];
             this.shadowGroup[i].setPosition(x, y);
             this.obstacleGroup[i].setPosition(x, y);
-
-            obstacle.refreshBody();
+            this.obstacleGroup[i].refreshBody();
         }
     }
 }
