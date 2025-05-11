@@ -10,7 +10,7 @@ export default class Field extends Phaser.Scene {
     create() {
         const { width, height } = this.sys.game.canvas;
 
-        this.cameras.main.setBackgroundColor('#dddddd');
+        this.cameras.main.setBackgroundColor('#000000');
 
         if (this.fromLocation) {
             this.cameras.main.fadeIn(1000, 0, 0, 0);
@@ -30,53 +30,29 @@ export default class Field extends Phaser.Scene {
         const charScale = Math.min((width * 0.035) / charOriginalWidth, 1);
         this.player.setScale(charScale);
 
-        // 카메라
         this.cameras.main.startFollow(this.player, true, 0.35, 0.35);
         this.cameras.main.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
-        // RenderTexture 생성 (검정 배경 + 구멍 뚫기)
-        this.obstacleMask = this.make.renderTexture({
-            width: worldSize,
-            height: worldSize,
-            add: true
-        });
-        this.obstacleMask.setOrigin(0.5);
-        this.obstacleMask.setPosition(0, 0);
-        this.obstacleMask.setDepth(10);
-        this.obstacleMask.setBlendMode(Phaser.BlendModes.MULTIPLY);
-
-        // 처음 검은색으로 덮기
-        this.obstacleMask.fill(0x000000, 1);
-
-        // 텍스처 준비
-        this.circleGradient = this.make.graphics({ x: 0, y: 0, add: false });
-        const r = 400;
-        const grad = this.circleGradient.createRadialGradient(r, r, r * 0.6, r, r, r);
-        grad.addColorStop(0, 'white');
-        grad.addColorStop(1, 'transparent');
-        this.circleGradient.fillStyle(grad);
-        this.circleGradient.fillCircle(r, r, r);
-        this.circleGradient.generateTexture('circleGradient', r * 2, r * 2);
-
-        // 직선 통로 텍스처
-        this.rectGradient = this.make.graphics({ x: 0, y: 0, add: false });
-        const corridorLength = 2400;
-        const corridorThickness = 240;
-        const corridorGrad = this.rectGradient.createLinearGradient(0, 0, corridorThickness, 0);
-        corridorGrad.addColorStop(0, 'transparent');
-        corridorGrad.addColorStop(0.5, 'white');
-        corridorGrad.addColorStop(1, 'transparent');
-        this.rectGradient.fillStyle(corridorGrad);
-        this.rectGradient.fillRect(0, 0, corridorLength, corridorThickness);
-        this.rectGradient.generateTexture('rectGradient', corridorLength, corridorThickness);
-
-        // 키 입력
         this.cursors = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
             down: Phaser.Input.Keyboard.KeyCodes.S,
             left: Phaser.Input.Keyboard.KeyCodes.A,
             right: Phaser.Input.Keyboard.KeyCodes.D,
         });
+
+        // RenderTexture를 사용한 시각적 배경 렌더링
+        this.rt = this.add.renderTexture(0, 0, width, height)
+            .setOrigin(0)
+            .setScrollFactor(0);
+
+        this.rt.setDepth(-1);
+
+        // 그라데이션 스타일
+        this.roomRadius = 400;
+        this.corridorWidth = 240;
+        this.roomDistance = 2400;
+
+        this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
     }
 
     update() {
@@ -92,40 +68,71 @@ export default class Field extends Phaser.Scene {
 
         this.player.setVelocity(vx, vy);
 
-        this.drawVisibleAreas();
+        this.updateRenderTexture();
     }
 
-    drawVisibleAreas() {
-        const px = this.player.x;
-        const py = this.player.y;
+    updateRenderTexture() {
+        const cam = this.cameras.main;
+        const { width, height } = this.sys.game.canvas;
 
-        // 전체 다시 검은색으로 덮기
-        this.obstacleMask.clear();
-        this.obstacleMask.fill(0x000000, 1);
+        this.rt.clear();
+        this.graphics.clear();
 
-        const gridSize = 2400;
-        const radius = 400;
-        const corridorThickness = 240;
+        // 검은 배경
+        this.graphics.fillStyle(0x000000, 1);
+        this.graphics.fillRect(0, 0, width, height);
 
-        const cx = Math.round(px / gridSize);
-        const cy = Math.round(py / gridSize);
+        // 방과 복도 계산
+        const viewLeft = cam.scrollX;
+        const viewTop = cam.scrollY;
+        const viewRight = cam.scrollX + width;
+        const viewBottom = cam.scrollY + height;
 
-        const range = 2; // 얼마나 많은 방을 표시할지
+        const nMin = Math.floor((viewLeft + this.roomDistance / 2) / this.roomDistance);
+        const nMax = Math.ceil((viewRight + this.roomDistance / 2) / this.roomDistance);
+        const mMin = Math.floor((viewTop + this.roomDistance / 2) / this.roomDistance);
+        const mMax = Math.ceil((viewBottom + this.roomDistance / 2) / this.roomDistance);
 
-        for (let dx = -range; dx <= range; dx++) {
-            for (let dy = -range; dy <= range; dy++) {
-                const roomX = (cx + dx) * gridSize;
-                const roomY = (cy + dy) * gridSize;
+        for (let n = nMin; n <= nMax; n++) {
+            for (let m = mMin; m <= mMax; m++) {
+                const cx = n * this.roomDistance;
+                const cy = m * this.roomDistance;
+
+                const localX = cx - cam.scrollX;
+                const localY = cy - cam.scrollY;
 
                 // 방
-                this.obstacleMask.draw('circleGradient', roomX - radius, roomY - radius);
+                const gradient = this.graphics.createRadialGradient(localX, localY, this.roomRadius * 0.7, localX, localY, this.roomRadius);
+                gradient.addColorStop(0, 'rgba(255,255,255,1)');
+                gradient.addColorStop(1, 'rgba(255,255,255,0)');
+                this.graphics.fillStyle(gradient);
+                this.graphics.fillCircle(localX, localY, this.roomRadius);
 
-                // 가로 복도
-                this.obstacleMask.draw('rectGradient', roomX - gridSize / 2, roomY - corridorThickness / 2);
+                // 복도: 가로
+                const gradH = this.graphics.createLinearGradient(
+                    localX - this.roomDistance / 2, localY,
+                    localX + this.roomDistance / 2, localY
+                );
+                gradH.addColorStop(0, 'rgba(255,255,255,0)');
+                gradH.addColorStop(0.5, 'rgba(255,255,255,1)');
+                gradH.addColorStop(1, 'rgba(255,255,255,0)');
+                this.graphics.fillStyle(gradH);
+                this.graphics.fillRect(localX - this.roomDistance / 2, localY - this.corridorWidth / 2, this.roomDistance, this.corridorWidth);
 
-                // 세로 복도 (90도 회전)
-                this.obstacleMask.draw('rectGradient', roomX - corridorThickness / 2, roomY - gridSize / 2, 1, 1, 90);
+                // 복도: 세로
+                const gradV = this.graphics.createLinearGradient(
+                    localX, localY - this.roomDistance / 2,
+                    localX, localY + this.roomDistance / 2
+                );
+                gradV.addColorStop(0, 'rgba(255,255,255,0)');
+                gradV.addColorStop(0.5, 'rgba(255,255,255,1)');
+                gradV.addColorStop(1, 'rgba(255,255,255,0)');
+                this.graphics.fillStyle(gradV);
+                this.graphics.fillRect(localX - this.corridorWidth / 2, localY - this.roomDistance / 2, this.corridorWidth, this.roomDistance);
             }
         }
+
+        // 렌더링 결과를 rt에 복사
+        this.rt.draw(this.graphics);
     }
 }
