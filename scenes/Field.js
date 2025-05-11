@@ -41,9 +41,11 @@ export default class Field extends Phaser.Scene {
 
         this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
 
-        this.roomRadius = 400;
+        this.roomRadius = 500;
         this.corridorWidth = 240;
-        this.roomDistance = 2400;
+        this.roomDistance = 1600;
+
+        this.createGradientCircleTexture();
 
         this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
     }
@@ -69,10 +71,6 @@ export default class Field extends Phaser.Scene {
         const { width, height } = this.sys.game.canvas;
 
         this.rt.clear();
-        this.graphics.clear();
-
-        this.graphics.fillStyle(0x000000, 1);
-        this.graphics.fillRect(0, 0, width, height);
 
         const viewLeft = cam.scrollX;
         const viewTop = cam.scrollY;
@@ -92,20 +90,44 @@ export default class Field extends Phaser.Scene {
                 const localX = cx - cam.scrollX;
                 const localY = cy - cam.scrollY;
 
-                // 방: 투명도 계단식 처리
-                for (let r = this.roomRadius; r > 0; r -= 40) {
-                    const alpha = Phaser.Math.Linear(0, 1, r / this.roomRadius);
-                    this.graphics.fillStyle(0xffffff, alpha);
-                    this.graphics.fillCircle(localX, localY, r);
-                }
+                // 방 (그라데이션 텍스처 사용)
+                this.rt.draw('room_gradient', localX - this.roomRadius, localY - this.roomRadius);
 
-                // 복도: 단순 직사각형 (불투명)
+                // 복도
+                this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
+
+                // 수평 복도
                 this.graphics.fillRect(localX - this.roomDistance / 2, localY - this.corridorWidth / 2, this.roomDistance, this.corridorWidth);
+                // 수직 복도
                 this.graphics.fillRect(localX - this.corridorWidth / 2, localY - this.roomDistance / 2, this.corridorWidth, this.roomDistance);
+
+                this.rt.draw(this.graphics);
             }
         }
+    }
 
-        this.rt.draw(this.graphics);
+    createGradientCircleTexture() {
+        const diameter = this.roomRadius * 2;
+        const canvas = this.textures.createCanvas('room_gradient', diameter, diameter);
+        const ctx = canvas.getContext();
+
+        const gradient = ctx.createRadialGradient(
+            this.roomRadius,
+            this.roomRadius,
+            0,
+            this.roomRadius,
+            this.roomRadius,
+            this.roomRadius
+        );
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.roomRadius, this.roomRadius, this.roomRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        canvas.refresh();
     }
 }
