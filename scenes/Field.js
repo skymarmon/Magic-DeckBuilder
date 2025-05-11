@@ -37,7 +37,7 @@ export default class Field extends Phaser.Scene {
         // 그림자/장애물 스프라이트 설정
         const shadowTexture = this.textures.get('field_shadow').getSourceImage();
         const shadowBaseScale = 2;
-        this.shadowScale = Math.min((width) / (shadowTexture.width * shadowBaseScale), 1) * shadowBaseScale;
+        this.shadowScale = Math.min((width) / (shadowTexture.width * shadowBaseScale), 5) * shadowBaseScale;
 
         this.shadowGroup = [];
         this.obstacleGroup = [];
