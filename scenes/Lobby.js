@@ -22,7 +22,7 @@ export default class Lobby extends Phaser.Scene {
         const baseX = width / 2 + displayWidth / 2;
         const baseY = height / 2 + displayHeight / 2;
 
-        const button_start = this.add.image(baseX - 0.26 * iw * scale, baseY - 0.26 * ih * scale, 'button_start').setScale(2.1 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_start = this.add.image(baseX - 0.26 * iw * scale, baseY - 0.26 * ih * scale, 'button_start').setScale(2.1 * scale).setInteractive();
         let startPressed = false;
         button_start.on('pointerdown', () => {
             startPressed = true;
@@ -40,7 +40,7 @@ export default class Lobby extends Phaser.Scene {
             button_start.clearTint();
         });
 
-        const button_research = this.add.image(baseX - 0.16 * iw * scale, baseY - 0.13 * ih * scale, 'button_research').setScale(1.5 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_research = this.add.image(baseX - 0.16 * iw * scale, baseY - 0.13 * ih * scale, 'button_research').setScale(1.5 * scale).setInteractive();
         let researchPressed = false;
         button_research.on('pointerdown', () => {
             researchPressed = true;
@@ -58,7 +58,7 @@ export default class Lobby extends Phaser.Scene {
             button_research.clearTint();
         });
 
-        const button_record = this.add.image(baseX - 0.06 * iw * scale, baseY - 0.13 * ih * scale, 'button_record').setScale(1.5 * scale).setAlpha(this.fromLicense ? 0 : 1).setInteractive();
+        const button_record = this.add.image(baseX - 0.06 * iw * scale, baseY - 0.13 * ih * scale, 'button_record').setScale(1.5 * scale).setInteractive();
         let recordPressed = false;
         button_record.on('pointerdown', () => {
             recordPressed = true;
