@@ -6,32 +6,27 @@ export default class Field extends Phaser.Scene {
     create() {
         const { width, height } = this.sys.game.canvas;
 
-        // 배경
         this.cameras.main.setBackgroundColor('#dddddd');
 
-        // 무한 맵 설정
         const worldSize = 10000;
         this.physics.world.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
-        // 캐릭터 생성
         this.player = this.physics.add.image(0, 0, 'field_character');
         this.player.setCollideWorldBounds(true);
         this.player.setDamping(true);
         this.player.setDrag(0.95);
         this.player.setMaxVelocity(200);
 
-        // 캐릭터 크기 화면 기준으로 20% 축소
         const originalWidth = this.textures.get('field_character').getSourceImage().width;
-        const scale = Math.min((width * 0.035) / originalWidth, 1); // 대략 화면 폭의 10% → 원래 크기의 20% 수준
+        const scale = Math.min((width * 0.035) / originalWidth, 1);
         this.player.setScale(scale);
 
-        // 카메라
         this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
         this.cameras.main.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
-        this.add.image(800, 800, 'field_shadow').setOrigin(0.5);
+        this.add.image(1000, 1000, 'field_shadow').setOrigin(0.5);
+        this.add.image(1000, -1000, 'field_shadow').setOrigin(0.5);
 
-        // 키 입력
         this.cursors = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
             down: Phaser.Input.Keyboard.KeyCodes.S,
