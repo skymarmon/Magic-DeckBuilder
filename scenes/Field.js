@@ -24,8 +24,8 @@ export default class Field extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
         this.cameras.main.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
-        this.add.image(1200, 1200, 'field_shadow').setOrigin(0.5);
-        this.add.image(1200, -1200, 'field_shadow').setOrigin(0.5);
+        this.add.image(1300, 1300, 'field_shadow').setOrigin(0.5);
+        this.add.image(1300, -1300, 'field_shadow').setOrigin(0.5);
 
         this.cursors = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
