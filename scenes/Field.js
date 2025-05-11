@@ -36,23 +36,26 @@ export default class Field extends Phaser.Scene {
 
         // 그림자/장애물 스프라이트 설정
         const shadowTexture = this.textures.get('field_shadow').getSourceImage();
-        const shadowBaseScale = 0.5;
+        const shadowBaseScale = 1;
         this.shadowScale = Math.min((width) / (shadowTexture.width * shadowBaseScale), 1) * shadowBaseScale;
 
         this.shadowGroup = [];
         this.obstacleGroup = [];
 
         for (let i = 0; i < 4; i++) {
-            // 시각적 그림자 (물리 없음)
+            // 시각적 그림자
             const shadow = this.add.image(0, 0, 'field_shadow')
                 .setOrigin(0.5)
                 .setScale(this.shadowScale);
             this.shadowGroup.push(shadow);
 
-            // 충돌용 장애물 (물리 있음)
+            // 충돌용 장애물
             const obstacle = this.physics.add.staticImage(0, 0, 'field_shadow_obstacle')
                 .setOrigin(0.5)
                 .setScale(this.shadowScale);
+
+            obstacle.refreshBody(); // ★ 충돌 영역을 스케일에 맞게 업데이트
+
             this.obstacleGroup.push(obstacle);
         }
 
