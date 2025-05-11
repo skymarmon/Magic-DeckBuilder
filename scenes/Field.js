@@ -3,10 +3,18 @@ export default class Field extends Phaser.Scene {
         super('Field');
     }
 
+    init(data) {
+        this.fromLocation = data.fromLocation || false;
+    }
+
     create() {
         const { width, height } = this.sys.game.canvas;
 
         this.cameras.main.setBackgroundColor('#dddddd');
+
+        if (this.fromLocation) {
+            this.cameras.main.fadeIn(1000, 0, 0, 0);
+        }
 
         const worldSize = 10000;
         this.physics.world.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);

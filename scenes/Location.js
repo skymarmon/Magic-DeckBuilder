@@ -35,7 +35,7 @@ export default class Location extends Phaser.Scene {
                 // 페이드아웃 후 Field 씬으로 이동
                 this.cameras.main.fadeOut(1000, 0, 0, 0);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
-                    this.scene.start('Field');
+                    this.scene.start('Field', { fromLocation: true });
                 });
             } else {
                 gamePressed = false;
