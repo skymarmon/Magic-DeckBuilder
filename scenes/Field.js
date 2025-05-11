@@ -29,7 +29,7 @@ export default class Field extends Phaser.Scene {
         const scale = Math.min((width * 0.035) / originalWidth, 1);
         this.player.setScale(scale);
 
-        this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
+        this.cameras.main.startFollow(this.player, true, 0.35, 0.35);
         this.cameras.main.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
         this.add.image(1300, 1300, 'field_shadow').setOrigin(0.5);
