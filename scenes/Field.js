@@ -10,16 +10,16 @@ export default class Field extends Phaser.Scene {
     create() {
         const { width, height } = this.sys.game.canvas;
 
-        this.cameras.main.setBackgroundColor('#dddddd');
+        this.cameras.main.setBackgroundColor('#000000');
 
         if (this.fromLocation) {
             this.cameras.main.fadeIn(1000, 0, 0, 0);
         }
 
-        const worldSize = 10000;
+        const worldSize = 100000; // 충분히 크게
         this.physics.world.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
-        // 플레이어
+        // 플레이어 설정
         this.player = this.physics.add.image(0, 0, 'field_character');
         this.player.setCollideWorldBounds(true);
         this.player.setDamping(true);
@@ -30,41 +30,11 @@ export default class Field extends Phaser.Scene {
         const charScale = Math.min((width * 0.035) / charOriginalWidth, 1);
         this.player.setScale(charScale);
 
-        // 카메라
+        // 카메라 설정
         this.cameras.main.startFollow(this.player, true, 0.35, 0.35);
         this.cameras.main.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
-        // 그림자/장애물 스프라이트 설정
-        const shadowTexture = this.textures.get('field_shadow').getSourceImage();
-        const shadowBaseScale = 1.8;
-        this.shadowScale = width / (shadowTexture.width) * shadowBaseScale;
-
-        this.shadowGroup = [];
-        this.obstacleGroup = [];
-
-        for (let i = 0; i < 4; i++) {
-            // 시각적 그림자
-            const shadow = this.add.image(0, 0, 'field_shadow')
-                .setOrigin(0.5)
-                .setScale(this.shadowScale);
-            this.shadowGroup.push(shadow);
-
-            // 충돌용 장애물
-            const obstacle = this.physics.add.staticImage(0, 0, 'field_shadow_obstacle')
-                .setOrigin(0.5)
-                .setScale(this.shadowScale);
-
-            obstacle.refreshBody(); // ★ 충돌 영역을 스케일에 맞게 업데이트
-
-            this.obstacleGroup.push(obstacle);
-        }
-
-        // 충돌 설정
-        this.obstacleGroup.forEach(obstacle => {
-            this.physics.add.collider(this.player, obstacle);
-        });
-
-        // 입력
+        // 입력 설정
         this.cursors = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
             down: Phaser.Input.Keyboard.KeyCodes.S,
@@ -72,17 +42,23 @@ export default class Field extends Phaser.Scene {
             right: Phaser.Input.Keyboard.KeyCodes.D,
         });
 
-        this.coordText = this.add.text(10, 10, '', {
-            font: '16px Arial',
-            fill: '#000000'
-        }).setScrollFactor(0); // HUD 고정
+        // 방과 복도 정보
+        this.roomRadius = 400;
+        this.roomSpacing = 2400;
+        this.corridorThickness = 240;
+
+        // 그래픽 레이어 (마스킹된 영역)
+        this.obstacleGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        this.maskImage = this.add.image(0, 0, this.textures.createCanvas('maskTexture', width, height));
+        this.maskImage.setOrigin(0.5);
+        this.maskImage.setDepth(-1);
+        this.maskImage.setScrollFactor(0);
+
+        this.maskImage.setPipeline('Light2D');
+        this.maskImage.setBlendMode(Phaser.BlendModes.MULTIPLY);
     }
 
     update() {
-        this.coordText.setText(
-            `x: ${Math.floor(this.player.x)}\ny: ${Math.floor(this.player.y)}`
-        );
-
         const speed = 200;
         let vx = 0;
         let vy = 0;
@@ -95,33 +71,73 @@ export default class Field extends Phaser.Scene {
 
         this.player.setVelocity(vx, vy);
 
-        // 플레이어 근처 4개의 (n, m) 계산
+        // 마스크 갱신
+        this.renderMask();
+    }
+
+    renderMask() {
+        const ctx = this.textures.get('maskTexture').getSourceImage().getContext('2d');
+        const canvas = this.textures.get('maskTexture').getSourceImage();
+        const { width, height } = canvas;
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, width, height);
+
         const px = this.player.x;
         const py = this.player.y;
-        const gridSize = 2600;
 
-        const nearestN = Math.round((px + 1300) / gridSize);
-        const nearestM = Math.round((py + 1300) / gridSize);
+        const cx = width / 2;
+        const cy = height / 2;
 
-        const candidates = [];
-        for (let dn = -1; dn <= 1; dn++) {
-            for (let dm = -1; dm <= 1; dm++) {
-                const n = nearestN + dn;
-                const m = nearestM + dm;
-                const x = gridSize * n - 1300;
-                const y = gridSize * m - 1300;
-                const distSq = (x - px) ** 2 + (y - py) ** 2;
-                candidates.push({ x, y, distSq });
+        const radius = this.roomRadius;
+        const spacing = this.roomSpacing;
+        const corridor = this.corridorThickness;
+
+        // 근처 9개 방 처리
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                const nx = Math.round(px / spacing) + dx;
+                const ny = Math.round(py / spacing) + dy;
+                const roomX = nx * spacing;
+                const roomY = ny * spacing;
+                const screenX = cx + (roomX - px);
+                const screenY = cy + (roomY - py);
+
+                // 방: 원형, 투명한 그라데이션 경계
+                const gradient = ctx.createRadialGradient(screenX, screenY, radius * 0.9, screenX, screenY, radius);
+                gradient.addColorStop(0, 'rgba(255,255,255,1)');
+                gradient.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 복도: 상하 좌우
+                const drawCorridor = (x1, y1, x2, y2) => {
+                    const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+                    grad.addColorStop(0, 'rgba(255,255,255,0)');
+                    grad.addColorStop(0.5, 'rgba(255,255,255,1)');
+                    grad.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.fillStyle = grad;
+                    if (x1 === x2) {
+                        // 수직
+                        ctx.fillRect(x1 - corridor / 2, Math.min(y1, y2), corridor, Math.abs(y2 - y1));
+                    } else {
+                        // 수평
+                        ctx.fillRect(Math.min(x1, x2), y1 - corridor / 2, Math.abs(x2 - x1), corridor);
+                    }
+                };
+
+                // 좌우 복도
+                drawCorridor(screenX, screenY, screenX + spacing, screenY);
+                drawCorridor(screenX, screenY, screenX - spacing, screenY);
+
+                // 상하 복도
+                drawCorridor(screenX, screenY, screenX, screenY + spacing);
+                drawCorridor(screenX, screenY, screenX, screenY - spacing);
             }
         }
 
-        candidates.sort((a, b) => a.distSq - b.distSq);
-        const nearest4 = candidates.slice(0, 4);
-
-        for (let i = 0; i < 4; i++) {
-            const { x, y } = nearest4[i];
-            this.shadowGroup[i].setPosition(x, y);
-            this.obstacleGroup[i].setPosition(x, y);
-        }
+        this.textures.get('maskTexture').refresh();
     }
 }
