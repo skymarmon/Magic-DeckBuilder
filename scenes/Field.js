@@ -10,7 +10,7 @@ export default class Field extends Phaser.Scene {
     create() {
         const { width, height } = this.sys.game.canvas;
 
-        this.cameras.main.setBackgroundColor('#000000');
+        this.cameras.main.setBackgroundColor('#cccccc');
 
         if (this.fromLocation) {
             this.cameras.main.fadeIn(1000, 0, 0, 0);
