@@ -71,9 +71,18 @@ export default class Field extends Phaser.Scene {
             left: Phaser.Input.Keyboard.KeyCodes.A,
             right: Phaser.Input.Keyboard.KeyCodes.D,
         });
+
+        this.coordText = this.add.text(10, 10, '', {
+            font: '16px Arial',
+            fill: '#000000'
+        }).setScrollFactor(0); // HUD 고정
     }
 
     update() {
+        this.coordText.setText(
+            `x: ${Math.floor(this.player.x)}\ny: ${Math.floor(this.player.y)}`
+        );
+
         const speed = 200;
         let vx = 0;
         let vy = 0;
@@ -113,7 +122,6 @@ export default class Field extends Phaser.Scene {
             const { x, y } = nearest4[i];
             this.shadowGroup[i].setPosition(x, y);
             this.obstacleGroup[i].setPosition(x, y);
-            this.obstacleGroup[i].refreshBody();
         }
     }
 }
