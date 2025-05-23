@@ -58,14 +58,37 @@ export default class Field extends Phaser.Scene {
         if (this.cursors.up.isDown) vy = -speed;
         else if (this.cursors.down.isDown) vy = speed;
 
-        let desiredX = this.player.x + vx * this.game.loop.delta / 1000;
-        let desiredY = this.player.y + vy * this.game.loop.delta / 1000;
+        const dt = this.game.loop.delta / 1000;
+        const px = this.player.x;
+        const py = this.player.y;
+        const nextX = px + vx * dt;
+        const nextY = py + vy * dt;
 
-        let dx = vx, dy = vy;
-        if (!this.isWalkable(desiredX, this.player.y)) dx = 0;
-        if (!this.isWalkable(this.player.x, desiredY)) dy = 0;
+        const isBlocked = !this.isWalkable(nextX, nextY);
 
-        this.player.setVelocity(dx, dy);
+        if (!isBlocked) {
+            this.player.setVelocity(vx, vy);
+        } else {
+            // 시도된 이동 방향
+            const moveVec = new Phaser.Math.Vector2(vx, vy).normalize();
+
+            // 가장 가까운 방 중심 계산
+            const n = Math.round(px / this.roomDistance);
+            const m = Math.round(py / this.roomDistance);
+            const cx = n * this.roomDistance;
+            const cy = m * this.roomDistance;
+
+            const dirToCenter = new Phaser.Math.Vector2(px - cx, py - cy).normalize(); // 방 중심에서 플레이어로의 벡터
+            const wallNormal = dirToCenter.clone();
+
+            // 이동 벡터에서 벽의 법선 방향 성분 제거 (벽을 따라 미끄러지기)
+            const dot = moveVec.dot(wallNormal);
+            const slideVec = moveVec.clone().subtract(wallNormal.clone().scale(dot)).normalize();
+
+            const finalSpeed = speed * (vx !== 0 && vy !== 0 ? 0.707 : 1); // 대각선 속도 보정
+            this.player.setVelocity(slideVec.x * finalSpeed, slideVec.y * finalSpeed);
+        }
+
         this.updateRenderTexture();
     }
 
