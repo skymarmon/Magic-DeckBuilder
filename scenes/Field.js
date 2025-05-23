@@ -41,12 +41,11 @@ export default class Field extends Phaser.Scene {
 
         this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
 
-        this.roomRadius = 1000; // 반지름 2배
-        this.corridorWidth = 720; // 짧은 쪽 길이 3배
-        this.roomDistance = 1600;
+        this.roomRadius = 1000;
+        this.corridorWidth = 720;
+        this.roomDistance = 3200; // ✅ 간격 증가
 
         this.createGradientTextures();
-
         this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
     }
 
@@ -61,9 +60,39 @@ export default class Field extends Phaser.Scene {
         if (this.cursors.up.isDown) vy = -speed;
         else if (this.cursors.down.isDown) vy = speed;
 
-        this.player.setVelocity(vx, vy);
+        // ✅ 충돌 판정: 방이나 복도 내부가 아니면 이동 금지
+        if (!this.isInsideRoomOrCorridor(this.player.x, this.player.y)) {
+            vx = 0;
+            vy = 0;
+        }
 
+        this.player.setVelocity(vx, vy);
         this.updateRenderTexture();
+    }
+
+    isInsideRoomOrCorridor(x, y) {
+        const r = this.roomRadius;
+        const d = this.roomDistance;
+        const c = this.corridorWidth;
+
+        const n = Math.round(x / d);
+        const m = Math.round(y / d);
+
+        const cx = n * d;
+        const cy = m * d;
+
+        // 방 내부 여부
+        const dx = x - cx;
+        const dy = y - cy;
+        if (dx * dx + dy * dy <= r * r) return true;
+
+        // 수평 복도 여부
+        if (Math.abs(dy) <= c / 2 && Math.abs(dx) <= d / 2) return true;
+
+        // 수직 복도 여부
+        if (Math.abs(dx) <= c / 2 && Math.abs(dy) <= d / 2) return true;
+
+        return false;
     }
 
     updateRenderTexture() {
@@ -90,28 +119,14 @@ export default class Field extends Phaser.Scene {
                 const localX = cx - cam.scrollX;
                 const localY = cy - cam.scrollY;
 
-                // 방
                 this.rt.draw('room_gradient', localX - this.roomRadius, localY - this.roomRadius);
-
-                // 수평 복도
-                this.rt.draw(
-                    'h_corridor_gradient',
-                    localX - this.roomDistance / 2,
-                    localY - this.corridorWidth / 2
-                );
-
-                // 수직 복도
-                this.rt.draw(
-                    'v_corridor_gradient',
-                    localX - this.corridorWidth / 2,
-                    localY - this.roomDistance / 2
-                );
+                this.rt.draw('h_corridor_gradient', localX - this.roomDistance / 2, localY - this.corridorWidth / 2);
+                this.rt.draw('v_corridor_gradient', localX - this.corridorWidth / 2, localY - this.roomDistance / 2);
             }
         }
     }
 
     createGradientTextures() {
-        // 방 (원형 그라데이션)
         const diameter = this.roomRadius * 2;
         const roomCanvas = this.textures.createCanvas('room_gradient', diameter, diameter);
         const rctx = roomCanvas.getContext();
@@ -136,7 +151,6 @@ export default class Field extends Phaser.Scene {
         rctx.fill();
         roomCanvas.refresh();
 
-        // 수평 복도
         const hWidth = this.roomDistance;
         const hHeight = this.corridorWidth;
         const hCanvas = this.textures.createCanvas('h_corridor_gradient', hWidth, hHeight);
@@ -152,7 +166,6 @@ export default class Field extends Phaser.Scene {
         hctx.fillRect(0, 0, hWidth, hHeight);
         hCanvas.refresh();
 
-        // 수직 복도
         const vWidth = this.corridorWidth;
         const vHeight = this.roomDistance;
         const vCanvas = this.textures.createCanvas('v_corridor_gradient', vWidth, vHeight);
