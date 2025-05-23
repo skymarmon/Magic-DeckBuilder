@@ -29,7 +29,7 @@ export default class Field extends Phaser.Scene {
         this.player.setScale(charScale);
 
         this.cameras.main.startFollow(this.player, true);
-        this.cameras.main.setLerp(1, 1); // 즉시 따라감
+        this.cameras.main.setLerp(1, 1);
         this.cameras.main.setBounds(-worldSize / 2, -worldSize / 2, worldSize, worldSize);
 
         this.cursors = this.input.keyboard.addKeys({
@@ -39,71 +39,91 @@ export default class Field extends Phaser.Scene {
             right: Phaser.Input.Keyboard.KeyCodes.D,
         });
 
-        this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
-
         this.roomRadius = 1400;
         this.corridorWidth = 720;
         this.roomDistance = 3200;
 
         this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
+
+        this.rt = this.add.renderTexture(
+            -worldSize / 2,
+            -worldSize / 2,
+            worldSize,
+            worldSize
+        ).setScrollFactor(1).setDepth(-1);
+
+        this.renderStaticBackground();
     }
 
     update() {
         const speed = 200;
         let vx = 0;
         let vy = 0;
+        const px = this.player.x;
+        const py = this.player.y;
+        const step = 5; // 충돌 예측 거리
 
-        if (this.cursors.left.isDown) vx = -speed;
-        else if (this.cursors.right.isDown) vx = speed;
-        if (this.cursors.up.isDown) vy = -speed;
-        else if (this.cursors.down.isDown) vy = speed;
+        if (this.cursors.left.isDown && this.isPassable(px - step, py)) vx = -speed;
+        else if (this.cursors.right.isDown && this.isPassable(px + step, py)) vx = speed;
 
-        // 장애물 판정 제거 -> 항상 이동 허용
+        if (this.cursors.up.isDown && this.isPassable(px, py - step)) vy = -speed;
+        else if (this.cursors.down.isDown && this.isPassable(px, py + step)) vy = speed;
+
         this.player.setVelocity(vx, vy);
-
-        this.updateRenderTexture();
     }
 
-    updateRenderTexture() {
-        const cam = this.cameras.main;
-        const { width, height } = this.sys.game.canvas;
+    isPassable(x, y) {
+        const r = this.roomRadius;
+        const d = this.roomDistance;
+        const w = this.corridorWidth;
 
-        this.rt.clear();
+        const nx = Math.round(x / d);
+        const ny = Math.round(y / d);
+        const cx = nx * d;
+        const cy = ny * d;
 
-        const viewLeft = cam.scrollX;
-        const viewTop = cam.scrollY;
-        const viewRight = cam.scrollX + width;
-        const viewBottom = cam.scrollY + height;
+        // 방 내부 판정
+        const dx = x - cx;
+        const dy = y - cy;
+        if (dx * dx + dy * dy <= r * r) return true;
 
-        const nMin = Math.floor((viewLeft + this.roomDistance / 2) / this.roomDistance);
-        const nMax = Math.ceil((viewRight + this.roomDistance / 2) / this.roomDistance);
-        const mMin = Math.floor((viewTop + this.roomDistance / 2) / this.roomDistance);
-        const mMax = Math.ceil((viewBottom + this.roomDistance / 2) / this.roomDistance);
+        // 수평 복도
+        if (Math.abs(y - cy) < w / 2 && Math.abs(x - cx) < d / 2) return true;
+
+        // 수직 복도
+        if (Math.abs(x - cx) < w / 2 && Math.abs(y - cy) < d / 2) return true;
+
+        return false;
+    }
+
+    renderStaticBackground() {
+        const nMin = Math.floor(-50000 / this.roomDistance);
+        const nMax = Math.ceil(50000 / this.roomDistance);
+        const mMin = Math.floor(-50000 / this.roomDistance);
+        const mMax = Math.ceil(50000 / this.roomDistance);
 
         for (let n = nMin; n <= nMax; n++) {
             for (let m = mMin; m <= mMax; m++) {
                 const cx = n * this.roomDistance;
                 const cy = m * this.roomDistance;
-                const localX = cx - cam.scrollX;
-                const localY = cy - cam.scrollY;
 
-                // 방: 원형 실선
+                // 방
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillCircle(cx, cy, this.roomRadius);
-                this.rt.draw(this.graphics, -cam.scrollX, -cam.scrollY);
+                this.rt.draw(this.graphics);
 
                 // 수평 복도
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillRect(cx - this.roomDistance / 2, cy - this.corridorWidth / 2, this.roomDistance, this.corridorWidth);
-                this.rt.draw(this.graphics, -cam.scrollX, -cam.scrollY);
+                this.rt.draw(this.graphics);
 
                 // 수직 복도
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillRect(cx - this.corridorWidth / 2, cy - this.roomDistance / 2, this.corridorWidth, this.roomDistance);
-                this.rt.draw(this.graphics, -cam.scrollX, -cam.scrollY);
+                this.rt.draw(this.graphics);
             }
         }
     }
