@@ -98,6 +98,7 @@ export default class Field extends Phaser.Scene {
                 const localX = cx - cam.scrollX;
                 const localY = cy - cam.scrollY;
 
+                // 방 그라데이션 (가장자리 부분만)
                 this.rt.draw('room_gradient', localX - this.roomRadius, localY - this.roomRadius);
 
                 // 수평 복도
@@ -110,6 +111,8 @@ export default class Field extends Phaser.Scene {
                     this.corridorWidth
                 );
                 this.rt.draw(this.graphics);
+
+                // 수평 복도 그라데이션 (짧은 쪽, 좌우 가장자리)
                 this.rt.draw('corridor_gradient_horizontal', localX - this.roomDistance / 2, localY - this.corridorWidth / 2);
 
                 // 수직 복도
@@ -122,6 +125,8 @@ export default class Field extends Phaser.Scene {
                     this.roomDistance
                 );
                 this.rt.draw(this.graphics);
+
+                // 수직 복도 그라데이션 (짧은 쪽, 위아래 가장자리)
                 this.rt.draw('corridor_gradient_vertical', localX - this.corridorWidth / 2, localY - this.roomDistance / 2);
             }
         }
@@ -155,43 +160,43 @@ export default class Field extends Phaser.Scene {
     }
 
     createCorridorWallTexture() {
-        // 수평 복도 그라데이션: 긴 쪽 벽 (위/아래 가장자리)만
+        // 수평 복도 그라데이션: 짧은 쪽 벽 (좌/우 가장자리)
         const h = this.corridorWidth;
         const w = this.roomDistance;
         const canvasH = this.textures.createCanvas('corridor_gradient_horizontal', w, h);
         const ctxH = canvasH.getContext();
 
-        const gradHeight = 40; // 그라데이션 두께
-        const gradientH = ctxH.createLinearGradient(0, 0, 0, gradHeight);
+        const gradWidth = 40; // 그라데이션 두께
+        const gradientH = ctxH.createLinearGradient(0, 0, gradWidth, 0);
         gradientH.addColorStop(0, 'rgba(255,255,255,1)');
         gradientH.addColorStop(1, 'rgba(255,255,255,0)');
         ctxH.fillStyle = gradientH;
-        ctxH.fillRect(0, 0, w, gradHeight);
+        ctxH.fillRect(0, 0, gradWidth, h);
 
-        const gradientH2 = ctxH.createLinearGradient(0, h - gradHeight, 0, h);
+        const gradientH2 = ctxH.createLinearGradient(w - gradWidth, 0, w, 0);
         gradientH2.addColorStop(0, 'rgba(255,255,255,0)');
         gradientH2.addColorStop(1, 'rgba(255,255,255,1)');
         ctxH.fillStyle = gradientH2;
-        ctxH.fillRect(0, h - gradHeight, w, gradHeight);
+        ctxH.fillRect(w - gradWidth, 0, gradWidth, h);
 
         canvasH.refresh();
 
-        // 수직 복도 그라데이션: 긴 쪽 벽 (좌/우 가장자리)만
+        // 수직 복도 그라데이션: 짧은 쪽 벽 (위/아래 가장자리)
         const canvasV = this.textures.createCanvas('corridor_gradient_vertical', h, w);
         const ctxV = canvasV.getContext();
 
-        const gradWidth = 40; // 그라데이션 두께
-        const gradientV = ctxV.createLinearGradient(0, 0, gradWidth, 0);
+        const gradHeight = 40; // 그라데이션 두께
+        const gradientV = ctxV.createLinearGradient(0, 0, 0, gradHeight);
         gradientV.addColorStop(0, 'rgba(255,255,255,1)');
         gradientV.addColorStop(1, 'rgba(255,255,255,0)');
         ctxV.fillStyle = gradientV;
-        ctxV.fillRect(0, 0, gradWidth, w);
+        ctxV.fillRect(0, 0, h, gradHeight);
 
-        const gradientV2 = ctxV.createLinearGradient(h - gradWidth, 0, h, 0);
+        const gradientV2 = ctxV.createLinearGradient(0, w - gradHeight, 0, w);
         gradientV2.addColorStop(0, 'rgba(255,255,255,0)');
         gradientV2.addColorStop(1, 'rgba(255,255,255,1)');
         ctxV.fillStyle = gradientV2;
-        ctxV.fillRect(h - gradWidth, 0, gradWidth, w);
+        ctxV.fillRect(0, w - gradHeight, h, gradHeight);
 
         canvasV.refresh();
     }
@@ -202,17 +207,18 @@ export default class Field extends Phaser.Scene {
         const cx = rx * this.roomDistance;
         const cy = ry * this.roomDistance;
 
-        const dx = Math.abs(x - cx);
-        const dy = Math.abs(y - cy);
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // 방 영역 (원 안)
-        const inRoom = dx <= this.roomRadius && dy <= this.roomRadius;
+        // 원형 방 내부인지 판정
+        const inRoom = dist <= this.roomRadius;
 
-        // 수평 복도 영역
-        const inHorizontal = dy <= this.corridorWidth / 2 && dx <= this.roomDistance / 2;
+        // 수평 복도 영역 (사각형)
+        const inHorizontal = Math.abs(dy) <= this.corridorWidth / 2 && Math.abs(dx) <= this.roomDistance / 2;
 
-        // 수직 복도 영역
-        const inVertical = dx <= this.corridorWidth / 2 && dy <= this.roomDistance / 2;
+        // 수직 복도 영역 (사각형)
+        const inVertical = Math.abs(dx) <= this.corridorWidth / 2 && Math.abs(dy) <= this.roomDistance / 2;
 
         // 방과 복도 영역을 제외한 모든 영역에서 충돌 발생
         return !(inRoom || inHorizontal || inVertical);
