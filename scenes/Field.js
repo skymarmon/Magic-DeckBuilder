@@ -41,7 +41,7 @@ export default class Field extends Phaser.Scene {
 
         this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
 
-        this.roomRadius = 1400;
+        this.roomRadius = 700;
         this.corridorWidth = 720;
         this.roomDistance = 3200;
 
@@ -58,46 +58,28 @@ export default class Field extends Phaser.Scene {
         if (this.cursors.up.isDown) vy = -speed;
         else if (this.cursors.down.isDown) vy = speed;
 
-        const nextX = this.player.x + vx * this.game.loop.delta / 1000;
-        const nextY = this.player.y + vy * this.game.loop.delta / 1000;
+        let desiredX = this.player.x + vx * this.game.loop.delta / 1000;
+        let desiredY = this.player.y + vy * this.game.loop.delta / 1000;
 
-        const canMove = this.isInsideRoomOrCorridor(nextX, nextY);
+        let dx = vx, dy = vy;
+        if (!this.isWalkable(desiredX, this.player.y)) dx = 0;
+        if (!this.isWalkable(this.player.x, desiredY)) dy = 0;
 
-        // 충돌 방향별 분리 이동
-        if (this.isInsideRoomOrCorridor(nextX, this.player.y)) {
-            this.player.setVelocityX(vx);
-        } else {
-            this.player.setVelocityX(0);
-        }
-
-        if (this.isInsideRoomOrCorridor(this.player.x, nextY)) {
-            this.player.setVelocityY(vy);
-        } else {
-            this.player.setVelocityY(0);
-        }
-
+        this.player.setVelocity(dx, dy);
         this.updateRenderTexture();
     }
 
-    isInsideRoomOrCorridor(x, y) {
+    isWalkable(x, y) {
         const n = Math.round(x / this.roomDistance);
         const m = Math.round(y / this.roomDistance);
         const cx = n * this.roomDistance;
         const cy = m * this.roomDistance;
 
-        // 방 (원형)
-        const distSq = (x - cx) ** 2 + (y - cy) ** 2;
-        if (distSq <= this.roomRadius ** 2) return true;
+        const inRoom = Phaser.Math.Distance.Between(x, y, cx, cy) <= this.roomRadius;
+        const inHorz = Math.abs(y - cy) <= this.corridorWidth / 2 && Math.abs(x - cx) <= this.roomDistance / 2;
+        const inVert = Math.abs(x - cx) <= this.corridorWidth / 2 && Math.abs(y - cy) <= this.roomDistance / 2;
 
-        // 수평 복도
-        const inHorz = Math.abs(y - cy) <= this.corridorWidth / 2 &&
-            Math.abs(x - cx) <= this.roomDistance / 2;
-
-        // 수직 복도
-        const inVert = Math.abs(x - cx) <= this.corridorWidth / 2 &&
-            Math.abs(y - cy) <= this.roomDistance / 2;
-
-        return inHorz || inVert;
+        return inRoom || inHorz || inVert;
     }
 
     updateRenderTexture() {
@@ -120,6 +102,7 @@ export default class Field extends Phaser.Scene {
             for (let m = mMin; m <= mMax; m++) {
                 const cx = n * this.roomDistance;
                 const cy = m * this.roomDistance;
+
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillCircle(cx, cy, this.roomRadius);
