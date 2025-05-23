@@ -41,11 +41,11 @@ export default class Field extends Phaser.Scene {
 
         this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
 
-        this.roomRadius = 500;
-        this.corridorWidth = 240;
+        this.roomRadius = 1000; // 반지름 2배
+        this.corridorWidth = 720; // 짧은 쪽 길이 3배
         this.roomDistance = 1600;
 
-        this.createGradientCircleTexture();
+        this.createGradientTextures();
 
         this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
     }
@@ -90,44 +90,82 @@ export default class Field extends Phaser.Scene {
                 const localX = cx - cam.scrollX;
                 const localY = cy - cam.scrollY;
 
-                // 방 (그라데이션 텍스처 사용)
+                // 방
                 this.rt.draw('room_gradient', localX - this.roomRadius, localY - this.roomRadius);
 
-                // 복도
-                this.graphics.clear();
-                this.graphics.fillStyle(0xffffff, 1);
-
                 // 수평 복도
-                this.graphics.fillRect(localX - this.roomDistance / 2, localY - this.corridorWidth / 2, this.roomDistance, this.corridorWidth);
-                // 수직 복도
-                this.graphics.fillRect(localX - this.corridorWidth / 2, localY - this.roomDistance / 2, this.corridorWidth, this.roomDistance);
+                this.rt.draw(
+                    'h_corridor_gradient',
+                    localX - this.roomDistance / 2,
+                    localY - this.corridorWidth / 2
+                );
 
-                this.rt.draw(this.graphics);
+                // 수직 복도
+                this.rt.draw(
+                    'v_corridor_gradient',
+                    localX - this.corridorWidth / 2,
+                    localY - this.roomDistance / 2
+                );
             }
         }
     }
 
-    createGradientCircleTexture() {
+    createGradientTextures() {
+        // 방 (원형 그라데이션)
         const diameter = this.roomRadius * 2;
-        const canvas = this.textures.createCanvas('room_gradient', diameter, diameter);
-        const ctx = canvas.getContext();
+        const roomCanvas = this.textures.createCanvas('room_gradient', diameter, diameter);
+        const rctx = roomCanvas.getContext();
 
-        const gradient = ctx.createRadialGradient(
+        const innerRadius = this.roomRadius * 0.8;
+        const outerRadius = this.roomRadius;
+
+        const gradient = rctx.createRadialGradient(
             this.roomRadius,
             this.roomRadius,
-            0,
+            innerRadius,
             this.roomRadius,
             this.roomRadius,
-            this.roomRadius
+            outerRadius
         );
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
 
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.roomRadius, this.roomRadius, this.roomRadius, 0, Math.PI * 2);
-        ctx.fill();
+        rctx.fillStyle = gradient;
+        rctx.beginPath();
+        rctx.arc(this.roomRadius, this.roomRadius, this.roomRadius, 0, Math.PI * 2);
+        rctx.fill();
+        roomCanvas.refresh();
 
-        canvas.refresh();
+        // 수평 복도
+        const hWidth = this.roomDistance;
+        const hHeight = this.corridorWidth;
+        const hCanvas = this.textures.createCanvas('h_corridor_gradient', hWidth, hHeight);
+        const hctx = hCanvas.getContext();
+
+        const hGrad = hctx.createLinearGradient(0, 0, hWidth, 0);
+        hGrad.addColorStop(0, 'rgba(255,255,255,0)');
+        hGrad.addColorStop(0.2, 'rgba(255,255,255,1)');
+        hGrad.addColorStop(0.8, 'rgba(255,255,255,1)');
+        hGrad.addColorStop(1, 'rgba(255,255,255,0)');
+
+        hctx.fillStyle = hGrad;
+        hctx.fillRect(0, 0, hWidth, hHeight);
+        hCanvas.refresh();
+
+        // 수직 복도
+        const vWidth = this.corridorWidth;
+        const vHeight = this.roomDistance;
+        const vCanvas = this.textures.createCanvas('v_corridor_gradient', vWidth, vHeight);
+        const vctx = vCanvas.getContext();
+
+        const vGrad = vctx.createLinearGradient(0, 0, 0, vHeight);
+        vGrad.addColorStop(0, 'rgba(255,255,255,0)');
+        vGrad.addColorStop(0.2, 'rgba(255,255,255,1)');
+        vGrad.addColorStop(0.8, 'rgba(255,255,255,1)');
+        vGrad.addColorStop(1, 'rgba(255,255,255,0)');
+
+        vctx.fillStyle = vGrad;
+        vctx.fillRect(0, 0, vWidth, vHeight);
+        vCanvas.refresh();
     }
 }
