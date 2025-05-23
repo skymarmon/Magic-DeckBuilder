@@ -42,10 +42,13 @@ export default class Field extends Phaser.Scene {
         this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
 
         this.roomRadius = 1000;
-        this.corridorWidth = 720;
-        this.roomDistance = 3200; // ✅ 간격 증가
+        this.corridorWidth = 240;
+        this.shortCorridorLength = this.corridorWidth * 3;
+        this.roomDistance = 3200;
 
-        this.createGradientTextures();
+        this.createGradientCircleTexture();
+        this.createCorridorWallTexture();
+
         this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
     }
 
@@ -60,39 +63,16 @@ export default class Field extends Phaser.Scene {
         if (this.cursors.up.isDown) vy = -speed;
         else if (this.cursors.down.isDown) vy = speed;
 
-        // ✅ 충돌 판정: 방이나 복도 내부가 아니면 이동 금지
-        if (!this.isInsideRoomOrCorridor(this.player.x, this.player.y)) {
-            vx = 0;
-            vy = 0;
-        }
+        const dt = this.game.loop.delta / 1000;
+        const nextX = this.player.x + vx * dt;
+        const nextY = this.player.y + vy * dt;
+
+        if (this.isBlocked(nextX, this.player.y)) vx = 0;
+        if (this.isBlocked(this.player.x, nextY)) vy = 0;
 
         this.player.setVelocity(vx, vy);
+
         this.updateRenderTexture();
-    }
-
-    isInsideRoomOrCorridor(x, y) {
-        const r = this.roomRadius;
-        const d = this.roomDistance;
-        const c = this.corridorWidth;
-
-        const n = Math.round(x / d);
-        const m = Math.round(y / d);
-
-        const cx = n * d;
-        const cy = m * d;
-
-        // 방 내부 여부
-        const dx = x - cx;
-        const dy = y - cy;
-        if (dx * dx + dy * dy <= r * r) return true;
-
-        // 수평 복도 여부
-        if (Math.abs(dy) <= c / 2 && Math.abs(dx) <= d / 2) return true;
-
-        // 수직 복도 여부
-        if (Math.abs(dx) <= c / 2 && Math.abs(dy) <= d / 2) return true;
-
-        return false;
     }
 
     updateRenderTexture() {
@@ -120,65 +100,102 @@ export default class Field extends Phaser.Scene {
                 const localY = cy - cam.scrollY;
 
                 this.rt.draw('room_gradient', localX - this.roomRadius, localY - this.roomRadius);
-                this.rt.draw('h_corridor_gradient', localX - this.roomDistance / 2, localY - this.corridorWidth / 2);
-                this.rt.draw('v_corridor_gradient', localX - this.corridorWidth / 2, localY - this.roomDistance / 2);
+
+                this.graphics.clear();
+                this.graphics.fillStyle(0xffffff, 1);
+
+                // 수평 복도 (위/아래에 그라데이션)
+                this.graphics.fillRect(
+                    localX - this.roomDistance / 2,
+                    localY - this.corridorWidth / 2,
+                    this.roomDistance,
+                    this.corridorWidth
+                );
+                this.rt.draw(this.graphics);
+                this.rt.draw('corridor_gradient_horizontal', localX - this.roomDistance / 2, localY - this.corridorWidth / 2);
+
+                // 수직 복도 (좌/우에 그라데이션)
+                this.graphics.clear();
+                this.graphics.fillStyle(0xffffff, 1);
+                this.graphics.fillRect(
+                    localX - this.corridorWidth / 2,
+                    localY - this.roomDistance / 2,
+                    this.corridorWidth,
+                    this.roomDistance
+                );
+                this.rt.draw(this.graphics);
+                this.rt.draw('corridor_gradient_vertical', localX - this.corridorWidth / 2, localY - this.roomDistance / 2);
             }
         }
     }
 
-    createGradientTextures() {
+    createGradientCircleTexture() {
         const diameter = this.roomRadius * 2;
-        const roomCanvas = this.textures.createCanvas('room_gradient', diameter, diameter);
-        const rctx = roomCanvas.getContext();
+        const canvas = this.textures.createCanvas('room_gradient', diameter, diameter);
+        const ctx = canvas.getContext();
 
-        const innerRadius = this.roomRadius * 0.8;
-        const outerRadius = this.roomRadius;
+        const innerRadius = this.roomRadius * 0.9;
 
-        const gradient = rctx.createRadialGradient(
+        const gradient = ctx.createRadialGradient(
             this.roomRadius,
             this.roomRadius,
             innerRadius,
             this.roomRadius,
             this.roomRadius,
-            outerRadius
+            this.roomRadius
         );
         gradient.addColorStop(0, 'rgba(255,255,255,1)');
         gradient.addColorStop(1, 'rgba(255,255,255,0)');
 
-        rctx.fillStyle = gradient;
-        rctx.beginPath();
-        rctx.arc(this.roomRadius, this.roomRadius, this.roomRadius, 0, Math.PI * 2);
-        rctx.fill();
-        roomCanvas.refresh();
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.roomRadius, this.roomRadius, this.roomRadius, 0, Math.PI * 2);
+        ctx.fill();
 
-        const hWidth = this.roomDistance;
-        const hHeight = this.corridorWidth;
-        const hCanvas = this.textures.createCanvas('h_corridor_gradient', hWidth, hHeight);
-        const hctx = hCanvas.getContext();
+        canvas.refresh();
+    }
 
-        const hGrad = hctx.createLinearGradient(0, 0, hWidth, 0);
-        hGrad.addColorStop(0, 'rgba(255,255,255,0)');
-        hGrad.addColorStop(0.2, 'rgba(255,255,255,1)');
-        hGrad.addColorStop(0.8, 'rgba(255,255,255,1)');
-        hGrad.addColorStop(1, 'rgba(255,255,255,0)');
+    createCorridorWallTexture() {
+        // 수평 복도용
+        const h = this.corridorWidth;
+        const w = this.roomDistance;
+        const canvasH = this.textures.createCanvas('corridor_gradient_horizontal', w, h);
+        const ctxH = canvasH.getContext();
+        const gradientH = ctxH.createLinearGradient(0, 0, 0, h);
+        gradientH.addColorStop(0, 'rgba(255,255,255,0)');
+        gradientH.addColorStop(0.2, 'rgba(255,255,255,1)');
+        gradientH.addColorStop(0.8, 'rgba(255,255,255,1)');
+        gradientH.addColorStop(1, 'rgba(255,255,255,0)');
+        ctxH.fillStyle = gradientH;
+        ctxH.fillRect(0, 0, w, h);
+        canvasH.refresh();
 
-        hctx.fillStyle = hGrad;
-        hctx.fillRect(0, 0, hWidth, hHeight);
-        hCanvas.refresh();
+        // 수직 복도용
+        const canvasV = this.textures.createCanvas('corridor_gradient_vertical', h, w);
+        const ctxV = canvasV.getContext();
+        const gradientV = ctxV.createLinearGradient(0, 0, h, 0);
+        gradientV.addColorStop(0, 'rgba(255,255,255,0)');
+        gradientV.addColorStop(0.2, 'rgba(255,255,255,1)');
+        gradientV.addColorStop(0.8, 'rgba(255,255,255,1)');
+        gradientV.addColorStop(1, 'rgba(255,255,255,0)');
+        ctxV.fillStyle = gradientV;
+        ctxV.fillRect(0, 0, h, w);
+        canvasV.refresh();
+    }
 
-        const vWidth = this.corridorWidth;
-        const vHeight = this.roomDistance;
-        const vCanvas = this.textures.createCanvas('v_corridor_gradient', vWidth, vHeight);
-        const vctx = vCanvas.getContext();
+    isBlocked(x, y) {
+        const rx = Math.round(x / this.roomDistance);
+        const ry = Math.round(y / this.roomDistance);
+        const cx = rx * this.roomDistance;
+        const cy = ry * this.roomDistance;
 
-        const vGrad = vctx.createLinearGradient(0, 0, 0, vHeight);
-        vGrad.addColorStop(0, 'rgba(255,255,255,0)');
-        vGrad.addColorStop(0.2, 'rgba(255,255,255,1)');
-        vGrad.addColorStop(0.8, 'rgba(255,255,255,1)');
-        vGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        const dx = Math.abs(x - cx);
+        const dy = Math.abs(y - cy);
 
-        vctx.fillStyle = vGrad;
-        vctx.fillRect(0, 0, vWidth, vHeight);
-        vCanvas.refresh();
+        const inRoom = dx <= this.roomRadius && dy <= this.roomRadius;
+        const inHorizontal = dy <= this.corridorWidth / 2 && dx <= this.roomDistance / 2;
+        const inVertical = dx <= this.corridorWidth / 2 && dy <= this.roomDistance / 2;
+
+        return !(inRoom || inHorizontal || inVertical);
     }
 }
