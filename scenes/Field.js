@@ -39,21 +39,14 @@ export default class Field extends Phaser.Scene {
             right: Phaser.Input.Keyboard.KeyCodes.D,
         });
 
+        this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
+        this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
+
         this.roomRadius = 1400;
         this.corridorWidth = 720;
         this.roomDistance = 3200;
 
-        this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
-
-        // ✅ RenderTexture 생성: 월드 크기에 맞게
-        this.rt = this.add.renderTexture(
-            -worldSize / 2,
-            -worldSize / 2,
-            worldSize,
-            worldSize
-        ).setScrollFactor(1).setDepth(-1);
-
-        this.renderStaticBackground();
+        this.prevTileRange = { nMin: 0, nMax: 0, mMin: 0, mMax: 0 };
     }
 
     update() {
@@ -67,13 +60,29 @@ export default class Field extends Phaser.Scene {
         else if (this.cursors.down.isDown) vy = speed;
 
         this.player.setVelocity(vx, vy);
+        this.updateRenderTexture();
     }
 
-    renderStaticBackground() {
-        const nMin = Math.floor(-50000 / this.roomDistance);
-        const nMax = Math.ceil(50000 / this.roomDistance);
-        const mMin = Math.floor(-50000 / this.roomDistance);
-        const mMax = Math.ceil(50000 / this.roomDistance);
+    updateRenderTexture() {
+        const cam = this.cameras.main;
+        const { width, height } = this.sys.game.canvas;
+
+        const viewLeft = cam.scrollX;
+        const viewTop = cam.scrollY;
+        const viewRight = cam.scrollX + width;
+        const viewBottom = cam.scrollY + height;
+
+        const nMin = Math.floor((viewLeft) / this.roomDistance);
+        const nMax = Math.ceil((viewRight) / this.roomDistance);
+        const mMin = Math.floor((viewTop) / this.roomDistance);
+        const mMax = Math.ceil((viewBottom) / this.roomDistance);
+
+        // 동일한 타일 범위면 렌더링 생략 (선택 사항)
+        const prev = this.prevTileRange;
+        if (nMin === prev.nMin && nMax === prev.nMax && mMin === prev.mMin && mMax === prev.mMax) return;
+        this.prevTileRange = { nMin, nMax, mMin, mMax };
+
+        this.rt.clear();
 
         for (let n = nMin; n <= nMax; n++) {
             for (let m = mMin; m <= mMax; m++) {
@@ -84,19 +93,19 @@ export default class Field extends Phaser.Scene {
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillCircle(cx, cy, this.roomRadius);
-                this.rt.draw(this.graphics);
+                this.rt.draw(this.graphics, -cam.scrollX, -cam.scrollY);
 
                 // 수평 복도
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillRect(cx - this.roomDistance / 2, cy - this.corridorWidth / 2, this.roomDistance, this.corridorWidth);
-                this.rt.draw(this.graphics);
+                this.rt.draw(this.graphics, -cam.scrollX, -cam.scrollY);
 
                 // 수직 복도
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillRect(cx - this.corridorWidth / 2, cy - this.roomDistance / 2, this.corridorWidth, this.roomDistance);
-                this.rt.draw(this.graphics);
+                this.rt.draw(this.graphics, -cam.scrollX, -cam.scrollY);
             }
         }
     }
