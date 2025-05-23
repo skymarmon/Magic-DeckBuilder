@@ -40,13 +40,12 @@ export default class Field extends Phaser.Scene {
         });
 
         this.rt = this.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(-1);
-        this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
 
         this.roomRadius = 1400;
         this.corridorWidth = 720;
         this.roomDistance = 3200;
 
-        this.prevTileRange = { nMin: 0, nMax: 0, mMin: 0, mMax: 0 };
+        this.graphics = this.make.graphics({ x: 0, y: 0, add: false });
     }
 
     update() {
@@ -59,49 +58,78 @@ export default class Field extends Phaser.Scene {
         if (this.cursors.up.isDown) vy = -speed;
         else if (this.cursors.down.isDown) vy = speed;
 
-        this.player.setVelocity(vx, vy);
+        const nextX = this.player.x + vx * this.game.loop.delta / 1000;
+        const nextY = this.player.y + vy * this.game.loop.delta / 1000;
+
+        const canMove = this.isInsideRoomOrCorridor(nextX, nextY);
+
+        // 충돌 방향별 분리 이동
+        if (this.isInsideRoomOrCorridor(nextX, this.player.y)) {
+            this.player.setVelocityX(vx);
+        } else {
+            this.player.setVelocityX(0);
+        }
+
+        if (this.isInsideRoomOrCorridor(this.player.x, nextY)) {
+            this.player.setVelocityY(vy);
+        } else {
+            this.player.setVelocityY(0);
+        }
+
         this.updateRenderTexture();
+    }
+
+    isInsideRoomOrCorridor(x, y) {
+        const n = Math.round(x / this.roomDistance);
+        const m = Math.round(y / this.roomDistance);
+        const cx = n * this.roomDistance;
+        const cy = m * this.roomDistance;
+
+        // 방 (원형)
+        const distSq = (x - cx) ** 2 + (y - cy) ** 2;
+        if (distSq <= this.roomRadius ** 2) return true;
+
+        // 수평 복도
+        const inHorz = Math.abs(y - cy) <= this.corridorWidth / 2 &&
+            Math.abs(x - cx) <= this.roomDistance / 2;
+
+        // 수직 복도
+        const inVert = Math.abs(x - cx) <= this.corridorWidth / 2 &&
+            Math.abs(y - cy) <= this.roomDistance / 2;
+
+        return inHorz || inVert;
     }
 
     updateRenderTexture() {
         const cam = this.cameras.main;
         const { width, height } = this.sys.game.canvas;
 
+        this.rt.clear();
+
         const viewLeft = cam.scrollX;
         const viewTop = cam.scrollY;
         const viewRight = cam.scrollX + width;
         const viewBottom = cam.scrollY + height;
 
-        const nMin = Math.floor((viewLeft) / this.roomDistance);
-        const nMax = Math.ceil((viewRight) / this.roomDistance);
-        const mMin = Math.floor((viewTop) / this.roomDistance);
-        const mMax = Math.ceil((viewBottom) / this.roomDistance);
-
-        // 동일한 타일 범위면 렌더링 생략 (선택 사항)
-        const prev = this.prevTileRange;
-        if (nMin === prev.nMin && nMax === prev.nMax && mMin === prev.mMin && mMax === prev.mMax) return;
-        this.prevTileRange = { nMin, nMax, mMin, mMax };
-
-        this.rt.clear();
+        const nMin = Math.floor((viewLeft + this.roomDistance / 2) / this.roomDistance);
+        const nMax = Math.ceil((viewRight + this.roomDistance / 2) / this.roomDistance);
+        const mMin = Math.floor((viewTop + this.roomDistance / 2) / this.roomDistance);
+        const mMax = Math.ceil((viewBottom + this.roomDistance / 2) / this.roomDistance);
 
         for (let n = nMin; n <= nMax; n++) {
             for (let m = mMin; m <= mMax; m++) {
                 const cx = n * this.roomDistance;
                 const cy = m * this.roomDistance;
-
-                // 방
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillCircle(cx, cy, this.roomRadius);
                 this.rt.draw(this.graphics, -cam.scrollX, -cam.scrollY);
 
-                // 수평 복도
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillRect(cx - this.roomDistance / 2, cy - this.corridorWidth / 2, this.roomDistance, this.corridorWidth);
                 this.rt.draw(this.graphics, -cam.scrollX, -cam.scrollY);
 
-                // 수직 복도
                 this.graphics.clear();
                 this.graphics.fillStyle(0xffffff, 1);
                 this.graphics.fillRect(cx - this.corridorWidth / 2, cy - this.roomDistance / 2, this.corridorWidth, this.roomDistance);
